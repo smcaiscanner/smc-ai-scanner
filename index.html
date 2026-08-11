@@ -3,284 +3,472 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>SMC AI Scanner</title>
 
 <style>
-*{box-sizing:border-box}
 
-body{
-    margin:0;
-    background:#0b0e11;
-    color:#eaecef;
-    font-family:Arial,Helvetica,sans-serif;
-    overflow:hidden
+* {
+    box-sizing: border-box;
 }
 
-button{font-family:inherit}
-
-.header{
-    height:58px;
-    background:#181a20;
-    border-bottom:1px solid #2b2f36;
-    display:flex;
-    align-items:center;
-    padding:0 18px;
-    gap:24px
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    background: #0b0e11;
+    color: #eaecef;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
 }
 
-.logo{
-    font-size:20px;
-    font-weight:bold;
-    color:#f0b90b;
-    white-space:nowrap
+button,
+input {
+    font-family: inherit;
 }
 
-.market-tabs{
-    display:flex;
-    gap:8px
+.header {
+    height: 58px;
+    background: #181a20;
+    border-bottom: 1px solid #2b2f36;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 18px;
+    gap: 24px;
 }
 
-.market-tabs button{
-    background:transparent;
-    border:0;
-    color:#848e9c;
-    padding:9px 15px;
-    cursor:pointer;
-    font-weight:bold
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+    color: #f0b90b;
+    white-space: nowrap;
 }
 
-.market-tabs button.active{
-    color:#f0b90b;
-    border-bottom:2px solid #f0b90b
+.market-tabs {
+    display: flex;
+    gap: 8px;
 }
 
-.search{
-    margin-left:auto
+.market-tabs button {
+    background: transparent;
+    border: 0;
+
+    color: #848e9c;
+
+    padding: 9px 15px;
+
+    cursor: pointer;
+    font-weight: bold;
 }
 
-.search input{
-    width:190px;
-    background:#2b2f36;
-    border:1px solid #3b4048;
-    color:white;
-    padding:9px 12px;
-    border-radius:6px;
-    outline:none
+.market-tabs button.active {
+    color: #f0b90b;
+    border-bottom: 2px solid #f0b90b;
 }
 
-.main{
-    display:grid;
-    grid-template-columns:220px minmax(500px,1fr) 280px;
-    height:calc(100vh - 58px)
+.search {
+    margin-left: auto;
 }
 
-.sidebar{
-    background:#161a1e;
-    border-right:1px solid #2b2f36;
-    overflow-y:auto
+.search input {
+    width: 190px;
+
+    background: #2b2f36;
+    border: 1px solid #3b4048;
+
+    color: white;
+
+    padding: 9px 12px;
+
+    border-radius: 6px;
+
+    outline: none;
 }
 
-.sidebar-title{
-    padding:16px;
-    font-size:13px;
-    color:#848e9c;
-    border-bottom:1px solid #2b2f36
+.main {
+    display: grid;
+
+    grid-template-columns:
+        220px
+        minmax(500px, 1fr)
+        280px;
+
+    height: calc(100vh - 58px);
 }
 
-.coin{
-    padding:12px 16px;
-    display:flex;
-    justify-content:space-between;
-    cursor:pointer;
-    border-bottom:1px solid #20242a
+.sidebar {
+    background: #161a1e;
+    border-right: 1px solid #2b2f36;
+
+    overflow-y: auto;
+}
+
+.sidebar-title {
+    padding: 16px;
+
+    font-size: 13px;
+
+    color: #848e9c;
+
+    border-bottom: 1px solid #2b2f36;
+}
+
+.coin {
+    padding: 12px 16px;
+
+    display: flex;
+    justify-content: space-between;
+
+    cursor: pointer;
+
+    border-bottom: 1px solid #20242a;
 }
 
 .coin:hover,
-.coin.active{
-    background:#1e2329
+.coin.active {
+    background: #1e2329;
 }
 
-.coin-name{
-    font-weight:bold
+.coin-name {
+    font-weight: bold;
 }
 
-.coin-price{
-    color:#d1d4dc
+.coin-price {
+    color: #d1d4dc;
 }
 
-.chart-area{
-    min-width:0;
-    background:#0b0e11
+.chart-area {
+    min-width: 0;
+
+    background: #0b0e11;
+
+    display: flex;
+    flex-direction: column;
 }
 
-.chart-header{
-    height:112px;
-    padding:12px 18px;
-    border-bottom:1px solid #2b2f36
+.chart-header {
+    height: 112px;
+
+    padding: 12px 18px;
+
+    border-bottom: 1px solid #2b2f36;
+
+    flex-shrink: 0;
 }
 
-.pair{
-    font-size:20px;
-    font-weight:bold
+.pair {
+    font-size: 20px;
+    font-weight: bold;
 }
 
-.live-price{
-    color:#0ecb81;
-    font-size:22px;
-    margin-left:15px
+.live-price {
+    color: #0ecb81;
+
+    font-size: 22px;
+
+    margin-left: 15px;
 }
 
-.stats{
-    display:flex;
-    gap:25px;
-    margin-top:9px;
-    color:#848e9c;
-    font-size:12px
+.stats {
+    display: flex;
+
+    gap: 25px;
+
+    margin-top: 9px;
+
+    color: #848e9c;
+
+    font-size: 12px;
 }
 
-.timeframes{
-    display:flex;
-    gap:4px;
-    margin-top:14px
+.stats b {
+    color: #eaecef;
 }
 
-.timeframes button{
-    border:0;
-    background:transparent;
-    color:#848e9c;
-    padding:5px 10px;
-    cursor:pointer
+.timeframes {
+    display: flex;
+
+    gap: 4px;
+
+    margin-top: 14px;
+}
+
+.timeframes button {
+    border: 0;
+
+    background: transparent;
+
+    color: #848e9c;
+
+    padding: 5px 10px;
+
+    cursor: pointer;
 }
 
 .timeframes button:hover,
-.timeframes button.active{
-    color:#f0b90b;
-    background:#2b2f36;
-    border-radius:4px
+.timeframes button.active {
+    color: #f0b90b;
+
+    background: #2b2f36;
+
+    border-radius: 4px;
 }
 
-.chart-wrapper{
-    position:relative;
-    height:calc(100% - 112px)
+.chart-wrapper {
+    position: relative;
+
+    flex: 1;
+
+    min-height: 0;
+
+    background: #0b0e11;
 }
 
-#chart{
-    width:100%;
-    height:100%;
-    display:block
+#chart {
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    right: 0;
+    bottom: 0;
+
+    width: 100%;
+    height: 100%;
 }
 
-.smc-panel{
-    position:absolute;
-    top:12px;
-    left:15px;
-    background:rgba(22,26,30,.94);
-    border:1px solid #30353d;
-    border-radius:6px;
-    padding:10px 13px;
-    font-size:12px;
-    min-width:190px
+.chart-toolbar {
+    position: absolute;
+
+    top: 10px;
+    right: 12px;
+
+    z-index: 20;
+
+    display: flex;
+
+    gap: 4px;
 }
 
-.smc-title{
-    color:#f0b90b;
-    font-weight:bold;
-    margin-bottom:7px
+.chart-toolbar button {
+    width: 30px;
+    height: 28px;
+
+    border: 1px solid #30353d;
+
+    background: rgba(30,35,41,.95);
+
+    color: #d1d4dc;
+
+    border-radius: 4px;
+
+    cursor: pointer;
+
+    font-size: 15px;
 }
 
-.smc-row{
-    display:flex;
-    justify-content:space-between;
-    margin:5px 0
+.chart-toolbar button:hover {
+    background: #2b2f36;
+    color: #f0b90b;
 }
 
-.ok{color:#0ecb81}
-.wait{color:#f0b90b}
-.bad{color:#f6465d}
+.smc-panel {
+    position: absolute;
 
-.rightbar{
-    background:#161a1e;
-    border-left:1px solid #2b2f36;
-    overflow-y:auto
+    top: 12px;
+    left: 15px;
+
+    z-index: 10;
+
+    background: rgba(22,26,30,.94);
+
+    border: 1px solid #30353d;
+
+    border-radius: 6px;
+
+    padding: 10px 13px;
+
+    font-size: 12px;
+
+    min-width: 205px;
+
+    pointer-events: none;
 }
 
-.right-title{
-    padding:16px;
-    font-weight:bold;
-    border-bottom:1px solid #2b2f36
+.smc-title {
+    color: #f0b90b;
+
+    font-weight: bold;
+
+    margin-bottom: 7px;
 }
 
-.orderbook{
-    padding:12px
+.smc-row {
+    display: flex;
+
+    justify-content: space-between;
+
+    margin: 5px 0;
+
+    gap: 15px;
 }
 
-.book-row{
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr;
-    font-size:11px;
-    padding:3px 0;
-    color:#b7bdc6
+.ok {
+    color: #0ecb81;
 }
 
-.book-header{
-    color:#5e6673;
-    margin-bottom:7px
+.wait {
+    color: #f0b90b;
 }
 
-.ask{color:#f6465d}
-.bid{color:#0ecb81}
-
-.signal{
-    margin:15px 12px;
-    padding:14px;
-    background:#1e2329;
-    border:1px solid #30353d;
-    border-radius:7px
+.bear {
+    color: #f6465d;
 }
 
-.signal-title{
-    color:#f0b90b;
-    font-weight:bold;
-    margin-bottom:10px
+.rightbar {
+    background: #161a1e;
+
+    border-left: 1px solid #2b2f36;
+
+    overflow-y: auto;
 }
 
-.signal-status{
-    font-size:18px;
-    font-weight:bold;
-    color:#0ecb81
+.right-title {
+    padding: 16px;
+
+    font-weight: bold;
+
+    border-bottom: 1px solid #2b2f36;
 }
 
-.footer{
-    position:fixed;
-    bottom:0;
-    left:220px;
-    right:280px;
-    background:rgba(24,26,32,.95);
-    border-top:1px solid #2b2f36;
-    padding:7px 15px;
-    font-size:11px;
-    color:#848e9c
+.orderbook {
+    padding: 12px;
 }
 
-@media(max-width:900px){
-    .main{
-        grid-template-columns:1fr
+.book-row {
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1fr
+        1fr;
+
+    font-size: 11px;
+
+    padding: 3px 0;
+
+    color: #b7bdc6;
+}
+
+.book-header {
+    color: #5e6673;
+
+    margin-bottom: 7px;
+}
+
+.ask {
+    color: #f6465d;
+}
+
+.bid {
+    color: #0ecb81;
+}
+
+.signal {
+    margin: 15px 12px;
+
+    padding: 14px;
+
+    background: #1e2329;
+
+    border: 1px solid #30353d;
+
+    border-radius: 7px;
+}
+
+.signal-title {
+    color: #f0b90b;
+
+    font-weight: bold;
+
+    margin-bottom: 10px;
+}
+
+.signal-status {
+    font-size: 18px;
+
+    font-weight: bold;
+
+    color: #0ecb81;
+}
+
+.signal p {
+    color: #d1d4dc;
+
+    line-height: 1.4;
+}
+
+.footer {
+    position: fixed;
+
+    bottom: 0;
+
+    left: 220px;
+    right: 280px;
+
+    z-index: 30;
+
+    background: rgba(24,26,32,.96);
+
+    border-top: 1px solid #2b2f36;
+
+    padding: 7px 15px;
+
+    font-size: 11px;
+
+    color: #848e9c;
+}
+
+.loading {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    color: #848e9c;
+
+    font-size: 14px;
+
+    z-index: 5;
+}
+
+@media(max-width: 900px) {
+
+    .main {
+        grid-template-columns: 1fr;
     }
 
     .sidebar,
-    .rightbar{
-        display:none
+    .rightbar {
+        display: none;
     }
 
-    .footer{
-        left:0;
-        right:0
+    .footer {
+        left: 0;
+        right: 0;
     }
 
-    .search{
-        display:none
+    .search {
+        display: none;
     }
+
 }
+
 </style>
 </head>
 
@@ -288,308 +476,414 @@ button{font-family:inherit}
 
 <header class="header">
 
-<div class="logo">SMC AI SCANNER</div>
+    <div class="logo">
+        SMC AI SCANNER
+    </div>
 
-<div class="market-tabs">
+    <div class="market-tabs">
 
-<button class="active"
-onclick="setMarket('SPOT',this)">
-Spot
-</button>
+        <button
+            class="active"
+            id="spotButton">
+            Spot
+        </button>
 
-<button onclick="setMarket('FUTURES',this)">
-Futures
-</button>
+        <button
+            id="futuresButton">
+            Futures
+        </button>
 
-</div>
+    </div>
 
-<div class="search">
+    <div class="search">
 
-<input
-id="search"
-placeholder="Search symbol..."
-onkeyup="searchCoins()">
+        <input
+            id="search"
+            placeholder="Search symbol...">
 
-</div>
+    </div>
 
 </header>
 
+
 <div class="main">
+
+
+<!-- LEFT WATCHLIST -->
 
 <aside class="sidebar">
 
-<div class="sidebar-title">
-MARKETS
-</div>
+    <div class="sidebar-title">
+        MARKETS
+    </div>
 
-<div id="coinList">
+    <div id="coinList">
 
-<div class="coin active"
-data-symbol="BTCUSDT"
-onclick="selectCoin('BTCUSDT')">
+        <div
+            class="coin active"
+            data-symbol="BTCUSDT">
 
-<span class="coin-name">
-BTC/USDT
-</span>
+            <span class="coin-name">
+                BTC/USDT
+            </span>
 
-<span class="coin-price"
-id="price-BTCUSDT">
---
-</span>
+            <span
+                class="coin-price"
+                id="price-BTCUSDT">
+                --
+            </span>
 
-</div>
+        </div>
 
-<div class="coin"
-data-symbol="ETHUSDT"
-onclick="selectCoin('ETHUSDT')">
 
-<span class="coin-name">
-ETH/USDT
-</span>
+        <div
+            class="coin"
+            data-symbol="ETHUSDT">
 
-<span class="coin-price"
-id="price-ETHUSDT">
---
-</span>
+            <span class="coin-name">
+                ETH/USDT
+            </span>
 
-</div>
+            <span
+                class="coin-price"
+                id="price-ETHUSDT">
+                --
+            </span>
 
-<div class="coin"
-data-symbol="SOLUSDT"
-onclick="selectCoin('SOLUSDT')">
+        </div>
 
-<span class="coin-name">
-SOL/USDT
-</span>
 
-<span class="coin-price"
-id="price-SOLUSDT">
---
-</span>
+        <div
+            class="coin"
+            data-symbol="SOLUSDT">
 
-</div>
+            <span class="coin-name">
+                SOL/USDT
+            </span>
 
-<div class="coin"
-data-symbol="AVAXUSDT"
-onclick="selectCoin('AVAXUSDT')">
+            <span
+                class="coin-price"
+                id="price-SOLUSDT">
+                --
+            </span>
 
-<span class="coin-name">
-AVAX/USDT
-</span>
+        </div>
 
-<span class="coin-price"
-id="price-AVAXUSDT">
---
-</span>
 
-</div>
+        <div
+            class="coin"
+            data-symbol="AVAXUSDT">
 
-<div class="coin"
-data-symbol="SEIUSDT"
-onclick="selectCoin('SEIUSDT')">
+            <span class="coin-name">
+                AVAX/USDT
+            </span>
 
-<span class="coin-name">
-SEI/USDT
-</span>
+            <span
+                class="coin-price"
+                id="price-AVAXUSDT">
+                --
+            </span>
 
-<span class="coin-price"
-id="price-SEIUSDT">
---
-</span>
+        </div>
 
-</div>
 
-<div class="coin"
-data-symbol="TIAUSDT"
-onclick="selectCoin('TIAUSDT')">
+        <div
+            class="coin"
+            data-symbol="SEIUSDT">
 
-<span class="coin-name">
-TIA/USDT
-</span>
+            <span class="coin-name">
+                SEI/USDT
+            </span>
 
-<span class="coin-price"
-id="price-TIAUSDT">
---
-</span>
+            <span
+                class="coin-price"
+                id="price-SEIUSDT">
+                --
+            </span>
 
-</div>
+        </div>
 
-<div class="coin"
-data-symbol="API3USDT"
-onclick="selectCoin('API3USDT')">
 
-<span class="coin-name">
-API3/USDT
-</span>
+        <div
+            class="coin"
+            data-symbol="TIAUSDT">
 
-<span class="coin-price"
-id="price-API3USDT">
---
-</span>
+            <span class="coin-name">
+                TIA/USDT
+            </span>
 
-</div>
+            <span
+                class="coin-price"
+                id="price-TIAUSDT">
+                --
+            </span>
 
-</div>
+        </div>
+
+
+        <div
+            class="coin"
+            data-symbol="API3USDT">
+
+            <span class="coin-name">
+                API3/USDT
+            </span>
+
+            <span
+                class="coin-price"
+                id="price-API3USDT">
+                --
+            </span>
+
+        </div>
+
+    </div>
 
 </aside>
 
 
+<!-- CHART -->
+
 <section class="chart-area">
 
-<div class="chart-header">
+    <div class="chart-header">
 
-<div>
+        <div>
 
-<span class="pair" id="pair">
-BTC/USDT
-</span>
+            <span
+                class="pair"
+                id="pair">
+                BTC/USDT
+            </span>
 
-<span class="live-price" id="livePrice">
---
-</span>
+            <span
+                class="live-price"
+                id="livePrice">
+                --
+            </span>
 
-</div>
-
-<div class="stats">
-
-<span>
-24h Change
-<b id="change">--</b>
-</span>
-
-<span>
-24h High
-<b id="high">--</b>
-</span>
-
-<span>
-24h Low
-<b id="low">--</b>
-</span>
-
-</div>
-
-<div class="timeframes">
-
-<button onclick="changeTF('1m',this)">
-1m
-</button>
-
-<button onclick="changeTF('5m',this)">
-5m
-</button>
-
-<button class="active"
-onclick="changeTF('15m',this)">
-15m
-</button>
-
-<button onclick="changeTF('1h',this)">
-1H
-</button>
-
-<button onclick="changeTF('4h',this)">
-4H
-</button>
-
-<button onclick="changeTF('1d',this)">
-1D
-</button>
-
-<button onclick="changeTF('1w',this)">
-1W
-</button>
-
-</div>
-
-</div>
+        </div>
 
 
-<div class="chart-wrapper">
+        <div class="stats">
 
-<canvas id="chart"></canvas>
+            <span>
+                24h Change
+                <b id="change">--</b>
+            </span>
 
-<div class="smc-panel">
+            <span>
+                24h High
+                <b id="high">--</b>
+            </span>
 
-<div class="smc-title">
-SMC AI ANALYSIS
-</div>
+            <span>
+                24h Low
+                <b id="low">--</b>
+            </span>
 
-<div class="smc-row">
-<span>Liquidity Sweep</span>
-<span class="wait" id="sweep">
-WAIT
-</span>
-</div>
+        </div>
 
-<div class="smc-row">
-<span>CHoCH / MSS</span>
-<span class="wait" id="choch">
-WAIT
-</span>
-</div>
 
-<div class="smc-row">
-<span>BOS</span>
-<span class="wait" id="bos">
-WAIT
-</span>
-</div>
+        <div class="timeframes">
 
-<div class="smc-row">
-<span>FVG / OB</span>
-<span class="wait" id="fvg">
-WAIT
-</span>
-</div>
+            <button data-tf="1m">
+                1m
+            </button>
 
-</div>
+            <button data-tf="5m">
+                5m
+            </button>
 
-</div>
+            <button
+                class="active"
+                data-tf="15m">
+                15m
+            </button>
+
+            <button data-tf="1h">
+                1H
+            </button>
+
+            <button data-tf="4h">
+                4H
+            </button>
+
+            <button data-tf="1d">
+                1D
+            </button>
+
+            <button data-tf="1w">
+                1W
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="chart-wrapper">
+
+        <div
+            id="chart">
+        </div>
+
+        <div
+            class="loading"
+            id="loading">
+            Loading chart...
+        </div>
+
+
+        <div class="chart-toolbar">
+
+            <button
+                id="zoomIn"
+                title="Zoom in">
+                +
+            </button>
+
+            <button
+                id="zoomOut"
+                title="Zoom out">
+                −
+            </button>
+
+            <button
+                id="resetChart"
+                title="Reset chart">
+                ⟳
+            </button>
+
+        </div>
+
+
+        <div class="smc-panel">
+
+            <div class="smc-title">
+                SMC AI ANALYSIS
+            </div>
+
+            <div class="smc-row">
+
+                <span>
+                    Liquidity Sweep
+                </span>
+
+                <span
+                    class="wait"
+                    id="sweep">
+                    WAIT
+                </span>
+
+            </div>
+
+
+            <div class="smc-row">
+
+                <span>
+                    CHoCH / MSS
+                </span>
+
+                <span
+                    class="wait"
+                    id="choch">
+                    WAIT
+                </span>
+
+            </div>
+
+
+            <div class="smc-row">
+
+                <span>
+                    BOS
+                </span>
+
+                <span
+                    class="wait"
+                    id="bos">
+                    WAIT
+                </span>
+
+            </div>
+
+
+            <div class="smc-row">
+
+                <span>
+                    FVG / OB
+                </span>
+
+                <span
+                    class="wait"
+                    id="fvg">
+                    WAIT
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </section>
 
 
+<!-- RIGHT BAR -->
+
 <aside class="rightbar">
 
-<div class="right-title">
-ORDER BOOK
-</div>
-
-<div class="orderbook">
-
-<div class="book-row book-header">
-
-<span>Price</span>
-<span>Amount</span>
-<span>Total</span>
-
-</div>
-
-<div id="asks"></div>
-
-<div style="height:12px"></div>
-
-<div id="bids"></div>
-
-</div>
+    <div class="right-title">
+        ORDER BOOK
+    </div>
 
 
-<div class="signal">
+    <div class="orderbook">
 
-<div class="signal-title">
-SMC AI SIGNAL
-</div>
+        <div class="book-row book-header">
 
-<div class="signal-status" id="signal">
-SCANNING...
-</div>
+            <span>
+                Price
+            </span>
 
-<p id="signalText">
-Waiting for SMC confirmation.
-</p>
+            <span>
+                Amount
+            </span>
 
-</div>
+            <span>
+                Total
+            </span>
+
+        </div>
+
+
+        <div id="asks"></div>
+
+        <div style="height:12px"></div>
+
+        <div id="bids"></div>
+
+    </div>
+
+
+    <div class="signal">
+
+        <div class="signal-title">
+            SMC AI SIGNAL
+        </div>
+
+        <div
+            class="signal-status"
+            id="signal">
+            SCANNING...
+        </div>
+
+        <p id="signalText">
+            Waiting for SMC confirmation.
+        </p>
+
+    </div>
 
 </aside>
 
@@ -597,811 +891,1402 @@ Waiting for SMC confirmation.
 
 
 <div class="footer">
-SMC AI Scanner • Live market data • Analysis tool only
+    SMC AI Scanner • Live market data • Analysis tool only • Charts by TradingView Lightweight Charts
 </div>
+
+
+<!-- TRADINGVIEW LIGHTWEIGHT CHARTS -->
+
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.0/dist/lightweight-charts.standalone.production.min.js"></script>
 
 
 <script>
 
-let currentSymbol="BTCUSDT";
-let currentTF="15m";
-let socket=null;
-let depthSocket=null;
-let candles=[];
+let currentSymbol = "BTCUSDT";
 
-const canvas=document.getElementById("chart");
-const ctx=canvas.getContext("2d");
+let currentTF = "15m";
+
+let socket = null;
+
+let depthSocket = null;
+
+let tickerSocket = null;
+
+let candles = [];
+
+let candleSeries = null;
+
+let chart = null;
 
 
-function resizeCanvas(){
+/* --------------------------------------------------
+   ELEMENTS
+-------------------------------------------------- */
 
-const rect=canvas.getBoundingClientRect();
-const dpr=window.devicePixelRatio||1;
+const chartContainer =
+    document.getElementById("chart");
 
-canvas.width=rect.width*dpr;
-canvas.height=rect.height*dpr;
+const loading =
+    document.getElementById("loading");
 
-ctx.setTransform(dpr,0,0,dpr,0,0);
 
-drawChart();
+/* --------------------------------------------------
+   FORMAT PRICE
+-------------------------------------------------- */
+
+function formatPrice(price) {
+
+    price = Number(price);
+
+    if (!Number.isFinite(price))
+        return "--";
+
+    if (price >= 1000)
+        return price.toLocaleString(
+            undefined,
+            {
+                maximumFractionDigits: 2
+            }
+        );
+
+    if (price >= 1)
+        return price.toFixed(4);
+
+    return price.toFixed(6);
+}
+
+
+/* --------------------------------------------------
+   CREATE CHART
+-------------------------------------------------- */
+
+function createTradingChart() {
+
+    chart =
+        LightweightCharts.createChart(
+            chartContainer,
+            {
+
+                layout: {
+
+                    background: {
+                        type:
+                            LightweightCharts.ColorType.Solid,
+                        color:
+                            "#0b0e11"
+                    },
+
+                    textColor:
+                        "#848e9c"
+
+                },
+
+                grid: {
+
+                    vertLines: {
+                        color:
+                            "#1c2026"
+                    },
+
+                    horzLines: {
+                        color:
+                            "#1c2026"
+                    }
+
+                },
+
+                crosshair: {
+
+                    mode:
+                        LightweightCharts.CrosshairMode.Normal
+
+                },
+
+                rightPriceScale: {
+
+                    borderColor:
+                        "#2b2f36",
+
+                    scaleMargins: {
+
+                        top: 0.08,
+
+                        bottom: 0.08
+
+                    }
+
+                },
+
+                timeScale: {
+
+                    borderColor:
+                        "#2b2f36",
+
+                    timeVisible:
+                        true,
+
+                    secondsVisible:
+                        false,
+
+                    rightOffset:
+                        8,
+
+                    barSpacing:
+                        8,
+
+                    minBarSpacing:
+                        2
+
+                },
+
+                handleScroll: {
+
+                    mouseWheel:
+                        true,
+
+                    pressedMouseMove:
+                        true,
+
+                    horzTouchDrag:
+                        true,
+
+                    vertTouchDrag:
+                        true
+
+                },
+
+                handleScale: {
+
+                    axisPressedMouseMove: {
+
+                        time:
+                            true,
+
+                        price:
+                            true
+
+                    },
+
+                    mouseWheel:
+                        true,
+
+                    pinch:
+                        true
+
+                }
+
+            }
+        );
+
+
+    candleSeries =
+        chart.addSeries(
+            LightweightCharts.CandlestickSeries,
+            {
+
+                upColor:
+                    "#0ecb81",
+
+                downColor:
+                    "#f6465d",
+
+                borderUpColor:
+                    "#0ecb81",
+
+                borderDownColor:
+                    "#f6465d",
+
+                wickUpColor:
+                    "#0ecb81",
+
+                wickDownColor:
+                    "#f6465d"
+
+            }
+        );
+
+
+    chart
+        .timeScale()
+        .fitContent();
+
+
+    window.addEventListener(
+        "resize",
+        resizeChart
+    );
 
 }
 
-window.addEventListener("resize",resizeCanvas);
 
+/* --------------------------------------------------
+   RESIZE
+-------------------------------------------------- */
 
-function formatPrice(p){
+function resizeChart() {
 
-if(!Number.isFinite(p))
-return "--";
+    if (!chart)
+        return;
 
-if(p>=1000)
-return p.toLocaleString(
-undefined,
-{maximumFractionDigits:2}
-);
+    const rect =
+        chartContainer.getBoundingClientRect();
 
-if(p>=1)
-return p.toFixed(4);
-
-return p.toFixed(6);
+    chart.resize(
+        rect.width,
+        rect.height
+    );
 
 }
 
 
-function updatePrice(price){
+/* --------------------------------------------------
+   LOAD HISTORICAL CANDLES
+-------------------------------------------------- */
 
-document.getElementById("livePrice")
-.innerText=formatPrice(price);
+async function loadHistoricalCandles() {
 
-const el=
+    loading.style.display =
+        "block";
+
+    try {
+
+        const url =
+            "https://api.binance.com/api/v3/klines"
+            + "?symbol="
+            + currentSymbol
+            + "&interval="
+            + currentTF
+            + "&limit=500";
+
+
+        const response =
+            await fetch(url);
+
+
+        if (!response.ok)
+            throw new Error(
+                "Binance API error"
+            );
+
+
+        const data =
+            await response.json();
+
+
+        candles =
+            data.map(
+                k => ({
+
+                    time:
+                        Math.floor(
+                            Number(k[0]) / 1000
+                        ),
+
+                    open:
+                        Number(k[1]),
+
+                    high:
+                        Number(k[2]),
+
+                    low:
+                        Number(k[3]),
+
+                    close:
+                        Number(k[4]),
+
+                    volume:
+                        Number(k[5])
+
+                })
+            );
+
+
+        candleSeries.setData(
+            candles
+        );
+
+
+        chart
+            .timeScale()
+            .fitContent();
+
+
+        loading.style.display =
+            "none";
+
+
+        detectSMC();
+
+
+    }
+    catch(error) {
+
+        console.error(error);
+
+        loading.innerText =
+            "Unable to load Binance chart data.";
+
+    }
+
+}
+
+
+/* --------------------------------------------------
+   BINANCE KLINE WEBSOCKET
+-------------------------------------------------- */
+
+function connectKline() {
+
+    if (socket) {
+
+        socket.close();
+
+        socket = null;
+
+    }
+
+
+    const url =
+        "wss://stream.binance.com:9443/ws/"
+        + currentSymbol.toLowerCase()
+        + "@kline_"
+        + currentTF;
+
+
+    socket =
+        new WebSocket(url);
+
+
+    socket.onopen =
+        function() {
+
+            console.log(
+                "Kline connected:",
+                currentSymbol,
+                currentTF
+            );
+
+        };
+
+
+    socket.onmessage =
+        function(event) {
+
+            const data =
+                JSON.parse(event.data);
+
+
+            if (!data.k)
+                return;
+
+
+            const k =
+                data.k;
+
+
+            const candle = {
+
+                time:
+                    Math.floor(
+                        Number(k.t) / 1000
+                    ),
+
+                open:
+                    Number(k.o),
+
+                high:
+                    Number(k.h),
+
+                low:
+                    Number(k.l),
+
+                close:
+                    Number(k.c),
+
+                volume:
+                    Number(k.v)
+
+            };
+
+
+            const last =
+                candles[
+                    candles.length - 1
+                ];
+
+
+            if (
+                last &&
+                last.time === candle.time
+            ) {
+
+                candles[
+                    candles.length - 1
+                ] = candle;
+
+            }
+            else {
+
+                candles.push(
+                    candle
+                );
+
+            }
+
+
+            if (candles.length > 1000) {
+
+                candles.shift();
+
+            }
+
+
+            candleSeries.update({
+
+                time:
+                    candle.time,
+
+                open:
+                    candle.open,
+
+                high:
+                    candle.high,
+
+                low:
+                    candle.low,
+
+                close:
+                    candle.close
+
+            });
+
+
+            updatePrice(
+                candle.close
+            );
+
+
+            detectSMC();
+
+        };
+
+
+    socket.onerror =
+        function(error) {
+
+            console.error(
+                "Kline websocket error",
+                error
+            );
+
+        };
+
+}
+
+
+/* --------------------------------------------------
+   PRICE
+-------------------------------------------------- */
+
+function updatePrice(price) {
+
+    document.getElementById(
+        "livePrice"
+    ).innerText =
+        formatPrice(price);
+
+
+    const el =
+        document.getElementById(
+            "price-" +
+            currentSymbol
+        );
+
+
+    if (el) {
+
+        el.innerText =
+            formatPrice(price);
+
+    }
+
+}
+
+
+/* --------------------------------------------------
+   24H TICKER
+-------------------------------------------------- */
+
+async function load24hStats() {
+
+    try {
+
+        const response =
+            await fetch(
+                "https://api.binance.com/api/v3/ticker/24hr?symbol="
+                + currentSymbol
+            );
+
+
+        const data =
+            await response.json();
+
+
+        document.getElementById(
+            "change"
+        ).innerText =
+            Number(
+                data.priceChangePercent
+            ).toFixed(2)
+            + "%";
+
+
+        document.getElementById(
+            "high"
+        ).innerText =
+            formatPrice(
+                data.highPrice
+            );
+
+
+        document.getElementById(
+            "low"
+        ).innerText =
+            formatPrice(
+                data.lowPrice
+            );
+
+
+        updatePrice(
+            data.lastPrice
+        );
+
+    }
+    catch(error) {
+
+        console.error(
+            "24h ticker error",
+            error
+        );
+
+    }
+
+}
+
+
+/* --------------------------------------------------
+   WATCHLIST LIVE PRICES
+-------------------------------------------------- */
+
+function connectWatchlistTicker() {
+
+    if (tickerSocket) {
+
+        tickerSocket.close();
+
+    }
+
+
+    const symbols = [
+
+        "btcusdt",
+        "ethusdt",
+        "solusdt",
+        "avaxusdt",
+        "seiusdt",
+        "tiausdt",
+        "api3usdt"
+
+    ];
+
+
+    const streams =
+        symbols
+            .map(
+                s =>
+                    s + "@ticker"
+            )
+            .join("/");
+
+
+    const url =
+        "wss://stream.binance.com:9443/stream?streams="
+        + streams;
+
+
+    tickerSocket =
+        new WebSocket(url);
+
+
+    tickerSocket.onmessage =
+        function(event) {
+
+            const packet =
+                JSON.parse(
+                    event.data
+                );
+
+
+            if (!packet.data)
+                return;
+
+
+            const data =
+                packet.data;
+
+
+            const symbol =
+                data.s;
+
+
+            const price =
+                Number(
+                    data.c
+                );
+
+
+            const el =
+                document.getElementById(
+                    "price-" +
+                    symbol
+                );
+
+
+            if (el) {
+
+                el.innerText =
+                    formatPrice(price);
+
+            }
+
+        };
+
+}
+
+
+/* --------------------------------------------------
+   ORDER BOOK
+-------------------------------------------------- */
+
+function connectOrderBook() {
+
+    if (depthSocket) {
+
+        depthSocket.close();
+
+    }
+
+
+    const url =
+        "wss://stream.binance.com:9443/ws/"
+        + currentSymbol.toLowerCase()
+        + "@depth20@100ms";
+
+
+    depthSocket =
+        new WebSocket(url);
+
+
+    depthSocket.onmessage =
+        function(event) {
+
+            const data =
+                JSON.parse(
+                    event.data
+                );
+
+
+            if (!data.bids || !data.asks)
+                return;
+
+
+            renderOrderBook(
+                data
+            );
+
+        };
+
+}
+
+
+/* --------------------------------------------------
+   RENDER ORDER BOOK
+-------------------------------------------------- */
+
+function renderOrderBook(data) {
+
+    const asks =
+        data.asks
+            .slice(0, 10)
+            .reverse();
+
+
+    const bids =
+        data.bids
+            .slice(0, 10);
+
+
+    let askHTML = "";
+
+    let bidHTML = "";
+
+
+    asks.forEach(
+        row => {
+
+            const price =
+                Number(row[0]);
+
+            const amount =
+                Number(row[1]);
+
+
+            askHTML += `
+
+                <div class="book-row">
+
+                    <span class="ask">
+                        ${formatPrice(price)}
+                    </span>
+
+                    <span>
+                        ${amount.toFixed(4)}
+                    </span>
+
+                    <span>
+                        ${(price * amount).toFixed(2)}
+                    </span>
+
+                </div>
+
+            `;
+
+        }
+    );
+
+
+    bids.forEach(
+        row => {
+
+            const price =
+                Number(row[0]);
+
+            const amount =
+                Number(row[1]);
+
+
+            bidHTML += `
+
+                <div class="book-row">
+
+                    <span class="bid">
+                        ${formatPrice(price)}
+                    </span>
+
+                    <span>
+                        ${amount.toFixed(4)}
+                    </span>
+
+                    <span>
+                        ${(price * amount).toFixed(2)}
+                    </span>
+
+                </div>
+
+            `;
+
+        }
+    );
+
+
+    document.getElementById(
+        "asks"
+    ).innerHTML =
+        askHTML;
+
+
+    document.getElementById(
+        "bids"
+    ).innerHTML =
+        bidHTML;
+
+}
+
+
+/* --------------------------------------------------
+   SMC BASIC ENGINE
+-------------------------------------------------- */
+
+function detectSMC() {
+
+    if (candles.length < 20)
+        return;
+
+
+    const recent =
+        candles.slice(-20);
+
+
+    const current =
+        recent[
+            recent.length - 1
+        ];
+
+
+    const previous =
+        recent.slice(
+            0,
+            -1
+        );
+
+
+    const previousHigh =
+        Math.max(
+            ...previous.map(
+                c => c.high
+            )
+        );
+
+
+    const previousLow =
+        Math.min(
+            ...previous.map(
+                c => c.low
+            )
+        );
+
+
+    let bullish =
+        current.close >
+        previousHigh;
+
+
+    let bearish =
+        current.close <
+        previousLow;
+
+
+    const bos =
+        document.getElementById(
+            "bos"
+        );
+
+
+    const signal =
+        document.getElementById(
+            "signal"
+        );
+
+
+    const signalText =
+        document.getElementById(
+            "signalText"
+        );
+
+
+    if (bullish) {
+
+        bos.innerText =
+            "BULLISH";
+
+        bos.className =
+            "ok";
+
+
+        signal.innerText =
+            "🟢 BULLISH";
+
+
+        signal.style.color =
+            "#0ecb81";
+
+
+        signalText.innerText =
+            "Potential bullish structure break detected.";
+
+    }
+    else if (bearish) {
+
+        bos.innerText =
+            "BEARISH";
+
+        bos.className =
+            "bear";
+
+
+        signal.innerText =
+            "🔴 BEARISH";
+
+
+        signal.style.color =
+            "#f6465d";
+
+
+        signalText.innerText =
+            "Potential bearish structure break detected.";
+
+    }
+    else {
+
+        bos.innerText =
+            "WAIT";
+
+        bos.className =
+            "wait";
+
+
+        signal.innerText =
+            "SCANNING...";
+
+
+        signal.style.color =
+            "#0ecb81";
+
+
+        signalText.innerText =
+            "Waiting for SMC confirmation.";
+
+    }
+
+}
+
+
+/* --------------------------------------------------
+   SELECT COIN
+-------------------------------------------------- */
+
+async function selectCoin(symbol) {
+
+    currentSymbol =
+        symbol;
+
+
+    document.querySelectorAll(
+        ".coin"
+    ).forEach(
+        coin => {
+
+            coin.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+
+    const selected =
+        document.querySelector(
+            '[data-symbol="' +
+            symbol +
+            '"]'
+        );
+
+
+    if (selected) {
+
+        selected.classList.add(
+            "active"
+        );
+
+    }
+
+
+    document.getElementById(
+        "pair"
+    ).innerText =
+        symbol.replace(
+            "USDT",
+            "/USDT"
+        );
+
+
+    await restartMarket();
+
+}
+
+
+/* --------------------------------------------------
+   CHANGE TIMEFRAME
+-------------------------------------------------- */
+
+async function changeTF(tf) {
+
+    currentTF =
+        tf;
+
+
+    document.querySelectorAll(
+        ".timeframes button"
+    ).forEach(
+        button => {
+
+            button.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+
+    const selected =
+        document.querySelector(
+            '[data-tf="' +
+            tf +
+            '"]'
+        );
+
+
+    if (selected) {
+
+        selected.classList.add(
+            "active"
+        );
+
+    }
+
+
+    await restartMarket();
+
+}
+
+
+/* --------------------------------------------------
+   RESTART MARKET
+-------------------------------------------------- */
+
+async function restartMarket() {
+
+    if (socket) {
+
+        socket.close();
+
+        socket = null;
+
+    }
+
+
+    if (depthSocket) {
+
+        depthSocket.close();
+
+        depthSocket = null;
+
+    }
+
+
+    candles = [];
+
+
+    document.getElementById(
+        "sweep"
+    ).innerText =
+        "WAIT";
+
+
+    document.getElementById(
+        "choch"
+    ).innerText =
+        "WAIT";
+
+
+    document.getElementById(
+        "bos"
+    ).innerText =
+        "WAIT";
+
+
+    document.getElementById(
+        "fvg"
+    ).innerText =
+        "WAIT";
+
+
+    candleSeries.setData([]);
+
+
+    await loadHistoricalCandles();
+
+    await load24hStats();
+
+    connectKline();
+
+    connectOrderBook();
+
+}
+
+
+/* --------------------------------------------------
+   ZOOM IN
+-------------------------------------------------- */
+
 document.getElementById(
-"price-"+currentSymbol
-);
+    "zoomIn"
+).addEventListener(
+    "click",
+    function() {
 
-if(el)
-el.innerText=formatPrice(price);
-
-}
-
-
-async function loadHistory(){
-
-try{
-
-const url=
-`https://api.binance.com/api/v3/klines?symbol=${currentSymbol}&interval=${currentTF}&limit=150`;
-
-const res=await fetch(url);
-
-if(!res.ok)
-throw new Error("Kline request failed");
-
-const data=await res.json();
-
-candles=data.map(k=>({
-
-time:k[0],
-open:+k[1],
-high:+k[2],
-low:+k[3],
-close:+k[4],
-volume:+k[5]
-
-}));
-
-if(candles.length){
-
-updatePrice(
-candles[candles.length-1].close
-);
-
-detectSMC();
-
-drawChart();
-
-}
-
-}catch(e){
-
-console.error(e);
-
-drawMessage(
-"Unable to load chart data"
-);
-
-}
-
-}
+        const range =
+            chart
+                .timeScale()
+                .getVisibleRange();
 
 
-async function loadStats(){
-
-try{
-
-const r=
-await fetch(
-`https://api.binance.com/api/v3/ticker/24hr?symbol=${currentSymbol}`
-);
-
-const d=await r.json();
-
-document.getElementById("change")
-.innerText=
-(+d.priceChangePercent).toFixed(2)+"%";
-
-document.getElementById("change")
-.style.color=
-+d.priceChangePercent>=0
-?"#0ecb81"
-:"#f6465d";
-
-document.getElementById("high")
-.innerText=
-formatPrice(+d.highPrice);
-
-document.getElementById("low")
-.innerText=
-formatPrice(+d.lowPrice);
-
-}catch(e){
-
-console.error(e);
-
-}
-
-}
+        if (!range)
+            return;
 
 
-function connectMarket(){
+        const from =
+            Number(range.from);
 
-if(socket)
-socket.close();
+        const to =
+            Number(range.to);
 
-if(depthSocket)
-depthSocket.close();
+        const center =
+            (from + to) / 2;
+
+        const half =
+            (to - from) * 0.35;
 
 
-socket=
-new WebSocket(
-`wss://stream.binance.com:9443/ws/${currentSymbol.toLowerCase()}@kline_${currentTF}`
+        chart
+            .timeScale()
+            .setVisibleRange({
+
+                from:
+                    center - half,
+
+                to:
+                    center + half
+
+            });
+
+    }
 );
 
 
-socket.onmessage=e=>{
+/* --------------------------------------------------
+   ZOOM OUT
+-------------------------------------------------- */
 
-const d=JSON.parse(e.data);
+document.getElementById(
+    "zoomOut"
+).addEventListener(
+    "click",
+    function() {
 
-if(!d.k)
-return;
-
-const k=d.k;
-
-const c={
-
-open:+k.o,
-high:+k.h,
-low:+k.l,
-close:+k.c,
-volume:+k.v,
-time:k.t
-
-};
-
-const last=
-candles[candles.length-1];
-
-if(last&&last.time===c.time)
-
-candles[candles.length-1]=c;
-
-else
-
-candles.push(c);
+        const range =
+            chart
+                .timeScale()
+                .getVisibleRange();
 
 
-if(candles.length>150)
-candles.shift();
+        if (!range)
+            return;
 
 
-updatePrice(c.close);
+        const from =
+            Number(range.from);
 
-detectSMC();
+        const to =
+            Number(range.to);
 
-drawChart();
+        const center =
+            (from + to) / 2;
 
-};
-
-
-socket.onerror=()=>
-console.log("Market websocket error");
-
-
-depthSocket=
-new WebSocket(
-`wss://stream.binance.com:9443/ws/${currentSymbol.toLowerCase()}@depth10@100ms`
-);
-
-depthSocket.onmessage=e=>
-renderOrderBook(
-JSON.parse(e.data)
-);
-
-loadStats();
-
-}
+        const half =
+            (to - from) * 0.75;
 
 
-function renderOrderBook(d){
+        chart
+            .timeScale()
+            .setVisibleRange({
 
-const asks=
-(d.asks||[]).slice(0,7);
+                from:
+                    center - half,
 
-const bids=
-(d.bids||[]).slice(0,7);
+                to:
+                    center + half
 
+            });
 
-const make=(arr,cls)=>
-
-arr.map(x=>`
-
-<div class="book-row">
-
-<span class="${cls}">
-${formatPrice(+x[0])}
-</span>
-
-<span>
-${(+x[1]).toFixed(4)}
-</span>
-
-<span>
-${(+x[0]*+x[1]).toFixed(2)}
-</span>
-
-</div>
-
-`).join("");
-
-
-document.getElementById("asks")
-.innerHTML=
-make(asks,"ask");
-
-document.getElementById("bids")
-.innerHTML=
-make(bids,"bid");
-
-}
-
-
-function drawMessage(msg){
-
-const w=canvas.clientWidth;
-const h=canvas.clientHeight;
-
-ctx.clearRect(0,0,w,h);
-
-ctx.fillStyle="#0b0e11";
-
-ctx.fillRect(0,0,w,h);
-
-ctx.fillStyle="#848e9c";
-
-ctx.font="14px Arial";
-
-ctx.fillText(
-msg,
-30,
-40
-);
-
-}
-
-
-function drawChart(){
-
-const width=canvas.clientWidth;
-const height=canvas.clientHeight;
-
-if(width<=0||height<=0)
-return;
-
-
-ctx.clearRect(0,0,width,height);
-
-ctx.fillStyle="#0b0e11";
-
-ctx.fillRect(
-0,
-0,
-width,
-height
+    }
 );
 
 
-if(candles.length<2){
+/* --------------------------------------------------
+   RESET CHART
+-------------------------------------------------- */
 
-drawMessage(
-"Loading live chart..."
-);
+document.getElementById(
+    "resetChart"
+).addEventListener(
+    "click",
+    function() {
 
-return;
+        chart
+            .timeScale()
+            .fitContent();
 
-}
-
-
-const visible=
-candles.slice(-90);
-
-
-let min=
-Math.min(
-...visible.map(c=>c.low)
-);
-
-let max=
-Math.max(
-...visible.map(c=>c.high)
+    }
 );
 
 
-const pad=
-(max-min)*.08||1;
+/* --------------------------------------------------
+   TIMEFRAME BUTTONS
+-------------------------------------------------- */
 
-min-=pad;
-max+=pad;
+document.querySelectorAll(
+    ".timeframes button"
+).forEach(
+    button => {
 
+        button.addEventListener(
+            "click",
+            function() {
 
-const chartHeight=
-height-45;
+                changeTF(
+                    this.dataset.tf
+                );
 
+            }
+        );
 
-const y=
-p=>
-chartHeight-
-((p-min)/(max-min))*chartHeight;
-
-
-const gap=
-width/visible.length;
-
-const cw=
-Math.max(
-3,
-gap*.62
+    }
 );
 
 
-ctx.strokeStyle="#1c2026";
-ctx.lineWidth=1;
+/* --------------------------------------------------
+   COIN BUTTONS
+-------------------------------------------------- */
 
+document.querySelectorAll(
+    ".coin"
+).forEach(
+    coin => {
 
-for(let i=0;i<7;i++){
+        coin.addEventListener(
+            "click",
+            function() {
 
-let gy=
-chartHeight/6*i;
+                selectCoin(
+                    this.dataset.symbol
+                );
 
-ctx.beginPath();
+            }
+        );
 
-ctx.moveTo(
-0,
-gy
-);
-
-ctx.lineTo(
-width,
-gy
-);
-
-ctx.stroke();
-
-}
-
-
-visible.forEach((c,i)=>{
-
-const x=
-i*gap+gap/2;
-
-const openY=
-y(c.open);
-
-const closeY=
-y(c.close);
-
-const bullish=
-c.close>=c.open;
-
-
-ctx.strokeStyle=
-bullish
-?"#0ecb81"
-:"#f6465d";
-
-ctx.fillStyle=
-ctx.strokeStyle;
-
-
-ctx.beginPath();
-
-ctx.moveTo(
-x,
-y(c.high)
-);
-
-ctx.lineTo(
-x,
-y(c.low)
-);
-
-ctx.stroke();
-
-
-ctx.fillRect(
-
-x-cw/2,
-
-Math.min(
-openY,
-closeY
-),
-
-cw,
-
-Math.max(
-1,
-Math.abs(
-closeY-openY
-)
-)
-
-);
-
-});
-
-
-ctx.fillStyle="#848e9c";
-ctx.font="10px Arial";
-
-
-for(let i=0;i<7;i++){
-
-const price=
-max-
-(max-min)/6*i;
-
-const py=
-chartHeight/6*i+12;
-
-
-ctx.fillText(
-
-formatPrice(price),
-
-Math.max(
-0,
-width-78
-),
-
-py
-
-);
-
-}
-
-}
-
-
-function setStatus(
-id,
-text,
-cls
-){
-
-const e=
-document.getElementById(id);
-
-e.innerText=text;
-
-e.className=cls;
-
-}
-
-
-function detectSMC(){
-
-if(candles.length<20)
-return;
-
-
-const c=
-candles[candles.length-1];
-
-const prev=
-candles.slice(-11,-1);
-
-
-const ph=
-Math.max(
-...prev.map(x=>x.high)
-);
-
-const pl=
-Math.min(
-...prev.map(x=>x.low)
+    }
 );
 
 
-const recent5=
-candles.slice(-6,-1);
+/* --------------------------------------------------
+   SEARCH
+-------------------------------------------------- */
+
+document.getElementById(
+    "search"
+).addEventListener(
+    "input",
+    function() {
+
+        const search =
+            this.value
+                .toUpperCase()
+                .trim();
 
 
-const rh=
-Math.max(
-...recent5.map(x=>x.high)
-);
+        document.querySelectorAll(
+            ".coin"
+        ).forEach(
+            coin => {
 
-const rl=
-Math.min(
-...recent5.map(x=>x.low)
-);
-
-
-setStatus(
-"sweep",
-"WAIT",
-"wait"
-);
-
-setStatus(
-"choch",
-"WAIT",
-"wait"
-);
-
-setStatus(
-"bos",
-"WAIT",
-"wait"
-);
-
-setStatus(
-"fvg",
-"WAIT",
-"wait"
-);
+                const text =
+                    coin.innerText
+                        .toUpperCase();
 
 
-if(c.low<rl&&c.close>rl)
+                coin.style.display =
+                    text.includes(search)
+                    ? "flex"
+                    : "none";
 
-setStatus(
-"sweep",
-"BULLISH",
-"ok"
-);
+            }
+        );
 
-else if(
-c.high>rh&&
-c.close<rh
-)
-
-setStatus(
-"sweep",
-"BEARISH",
-"bad"
+    }
 );
 
 
-if(c.close>ph){
+/* --------------------------------------------------
+   SPOT / FUTURES
+-------------------------------------------------- */
 
-setStatus(
-"choch",
-"BULLISH",
-"ok"
-);
+document.getElementById(
+    "spotButton"
+).addEventListener(
+    "click",
+    function() {
 
-setStatus(
-"bos",
-"BULLISH",
-"ok"
-);
+        document
+            .getElementById(
+                "spotButton"
+            )
+            .classList.add(
+                "active"
+            );
 
-document.getElementById("signal")
-.innerText="🟢 BULLISH";
+        document
+            .getElementById(
+                "futuresButton"
+            )
+            .classList.remove(
+                "active"
+            );
 
-document.getElementById("signalText")
-.innerText=
-"Potential bullish structure break detected.";
-
-}
-
-else if(c.close<pl){
-
-setStatus(
-"choch",
-"BEARISH",
-"bad"
-);
-
-setStatus(
-"bos",
-"BEARISH",
-"bad"
-);
-
-document.getElementById("signal")
-.innerText="🔴 BEARISH";
-
-document.getElementById("signalText")
-.innerText=
-"Potential bearish structure break detected.";
-
-}
-
-else{
-
-document.getElementById("signal")
-.innerText=
-"SCANNING...";
-
-document.getElementById("signalText")
-.innerText=
-"Waiting for SMC confirmation.";
-
-}
-
-
-const a=
-candles[candles.length-3];
-
-const b=
-candles[candles.length-2];
-
-
-if(a&&b&&c.low>b.high)
-
-setStatus(
-"fvg",
-"BULLISH",
-"ok"
+    }
 );
 
 
-if(a&&b&&c.high<b.low)
+document.getElementById(
+    "futuresButton"
+).addEventListener(
+    "click",
+    function() {
 
-setStatus(
-"fvg",
-"BEARISH",
-"bad"
-);
+        document
+            .getElementById(
+                "futuresButton"
+            )
+            .classList.add(
+                "active"
+            );
 
-}
-
-
-function selectCoin(symbol){
-
-currentSymbol=symbol;
-
-
-document
-.querySelectorAll(".coin")
-.forEach(c=>
-c.classList.remove("active")
-);
-
-
-const selected=
-document.querySelector(
-`[data-symbol="${symbol}"]`
-);
+        document
+            .getElementById(
+                "spotButton"
+            )
+            .classList.remove(
+                "active"
+            );
 
 
-if(selected)
-selected.classList.add("active");
+        alert(
+            "Futures data engine will be connected in the next build."
+        );
 
-
-document.getElementById("pair")
-.innerText=
-symbol.replace(
-"USDT",
-"/USDT"
+    }
 );
 
 
-candles=[];
+/* --------------------------------------------------
+   START
+-------------------------------------------------- */
 
-drawMessage(
-"Loading live chart..."
-);
+createTradingChart();
 
-loadHistory();
+connectWatchlistTicker();
 
-connectMarket();
-
-}
-
-
-function changeTF(tf,button){
-
-currentTF=tf;
-
-
-document
-.querySelectorAll(".timeframes button")
-.forEach(b=>
-b.classList.remove("active")
-);
-
-
-button.classList.add("active");
-
-candles=[];
-
-drawMessage(
-"Loading live chart..."
-);
-
-loadHistory();
-
-connectMarket();
-
-}
-
-
-function setMarket(type,button){
-
-document
-.querySelectorAll(".market-tabs button")
-.forEach(b=>
-b.classList.remove("active")
-);
-
-
-button.classList.add("active");
-
-
-if(type==="FUTURES"){
-
-alert(
-"Futures terminal selected. Futures data engine will be connected in the next build."
-);
-
-}
-
-}
-
-
-function searchCoins(){
-
-const s=
-document
-.getElementById("search")
-.value
-.toUpperCase();
-
-
-document
-.querySelectorAll(".coin")
-.forEach(c=>
-
-c.style.display=
-c.innerText
-.toUpperCase()
-.includes(s)
-?"flex"
-:"none"
-
-);
-
-}
-
-
-resizeCanvas();
-
-loadHistory();
-
-connectMarket();
+restartMarket();
 
 </script>
 
