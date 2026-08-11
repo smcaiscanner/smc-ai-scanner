@@ -3,80 +3,146 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SMC AI Scanner — Binance Chart</title>
+<title>SMC AI Scanner</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#0b0e11;overflow:hidden;font-family:Arial,Helvetica,sans-serif}
-#top{height:52px;background:#181a20;border-bottom:1px solid #2b2f36;display:flex;align-items:center;gap:8px;padding:0 12px;color:#eaecef}
-.logo{color:#f0b90b;font-weight:700;font-size:18px;margin-right:10px;white-space:nowrap}
-button{background:#2b2f36;color:#eaecef;border:1px solid #3b4048;border-radius:4px;padding:6px 10px;cursor:pointer}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b0e11;font-family:Arial,Helvetica,sans-serif}
+#top{
+ height:52px;background:#181a20;border-bottom:1px solid #2b2f36;
+ display:flex;align-items:center;gap:7px;padding:0 12px;color:#eaecef
+}
+.logo{font-size:18px;font-weight:700;color:#f0b90b;margin-right:8px}
+input{width:165px;background:#0b0e11;color:#fff;border:1px solid #3b4048;border-radius:4px;padding:7px 9px}
+button{
+ background:#2b2f36;color:#eaecef;border:1px solid #3b4048;
+ border-radius:4px;padding:7px 10px;cursor:pointer
+}
 button:hover{border-color:#f0b90b;color:#f0b90b}
-#symbol{width:160px;background:#0b0e11;color:#fff;border:1px solid #3b4048;border-radius:4px;padding:7px 9px}
-#chart{position:absolute;top:53px;left:0;right:0;bottom:0}
-.note{margin-left:auto;color:#848e9c;font-size:11px}
+.swatch{width:28px;height:28px;padding:2px;border-radius:50%;cursor:pointer;border:1px solid #555}
+#chart{position:absolute;top:52px;left:0;right:0;bottom:0}
+.tip{margin-left:auto;color:#848e9c;font-size:11px}
 </style>
 </head>
 <body>
 <div id="top">
-  <div class="logo">SMC AI SCANNER</div>
-  <input id="symbol" value="BINANCE:BTCUSDT" placeholder="BINANCE:BTCUSDT">
-  <button onclick="loadSymbol()">Load</button>
-  <button onclick="loadSymbol('BINANCE:BTCUSDT')">BTC</button>
-  <button onclick="loadSymbol('BINANCE:ETHUSDT')">ETH</button>
-  <button onclick="loadSymbol('BINANCE:AVAXUSDT')">AVAX</button>
-  <button onclick="loadSymbol('BINANCE:SEIUSDT')">SEI</button>
-  <button onclick="loadSymbol('BINANCE:TIAUSDT')">TIA</button>
-  <button onclick="loadSymbol('BINANCE:API3USDT')">API3</button>
-  <div class="note">Live Binance market • TradingView drawing engine</div>
+ <div class="logo">SMC AI SCANNER</div>
+ <input id="symbol" value="BINANCE:BTCUSDT">
+ <button onclick="loadSymbol()">Load</button>
+ <button onclick="loadSymbol('BINANCE:BTCUSDT')">BTC</button>
+ <button onclick="loadSymbol('BINANCE:ETHUSDT')">ETH</button>
+ <button onclick="loadSymbol('BINANCE:AVAXUSDT')">AVAX</button>
+ <button onclick="loadSymbol('BINANCE:SEIUSDT')">SEI</button>
+ <button onclick="resetChart()">Reset</button>
+ <button onclick="toggleGrid()">Grid</button>
+ <button onclick="toggleCandle()">Candle</button>
+ <button class="swatch" title="Dark chart" style="background:#0b0e11" onclick="setChartColor('#0b0e11')"></button>
+ <button class="swatch" title="Dark blue chart" style="background:#07111f" onclick="setChartColor('#07111f')"></button>
+ <button class="swatch" title="Black chart" style="background:#000000" onclick="setChartColor('#000000')"></button>
+ <div class="tip">Right-click chart for TradingView menu • Ctrl/Cmd = magnet</div>
 </div>
 <div id="chart"></div>
 
 <script src="https://s3.tradingview.com/tv.js"></script>
 <script>
-let widget=null;
-
-function loadSymbol(s){
-  const symbol=s || document.getElementById('symbol').value.trim().toUpperCase();
-  document.getElementById('symbol').value=symbol;
-  if(widget && widget.setSymbol){
-    widget.setSymbol(symbol,"15");
-    return;
-  }
-  create(symbol);
-}
+let tv=null;
+let grid=true;
+let candleStyle=1;
+let bg='#0b0e11';
 
 function create(symbol){
-  widget=new TradingView.widget({
-    autosize:true,
-    symbol:symbol,
-    interval:"15",
-    timezone:"Etc/UTC",
-    theme:"dark",
-    style:"1",
-    locale:"en",
-    toolbar_bg:"#181a20",
-    enable_publishing:false,
-    allow_symbol_change:true,
-    hide_top_toolbar:false,
-    hide_side_toolbar:false,
-    hide_legend:false,
-    save_image:true,
-    withdateranges:true,
-    details:true,
-    hotlist:true,
-    calendar:true,
-    container_id:"chart",
-    studies:[],
-    enabled_features:[
-      "side_toolbar_in_fullscreen_mode"
-    ]
-  });
+ tv=new TradingView.widget({
+   autosize:true,
+   symbol:symbol,
+   interval:'15',
+   timezone:'Etc/UTC',
+   theme:'dark',
+   style:'1',
+   locale:'en',
+   toolbar_bg:'#181a20',
+   enable_publishing:false,
+   allow_symbol_change:true,
+   hide_top_toolbar:false,
+   hide_side_toolbar:false,
+   hide_legend:false,
+   save_image:true,
+   withdateranges:true,
+   details:true,
+   hotlist:true,
+   calendar:true,
+   container_id:'chart',
+   enabled_features:['side_toolbar_in_fullscreen_mode'],
+   overrides:{
+     'paneProperties.backgroundType':'solid',
+     'paneProperties.background':bg,
+     'paneProperties.vertGridProperties.color':grid?'#1b2027':'#0b0e11',
+     'paneProperties.horzGridProperties.color':grid?'#1b2027':'#0b0e11',
+     'mainSeriesProperties.style':candleStyle,
+     'mainSeriesProperties.candleStyle.upColor':'#0ecb81',
+     'mainSeriesProperties.candleStyle.downColor':'#f6465d',
+     'mainSeriesProperties.candleStyle.borderUpColor':'#0ecb81',
+     'mainSeriesProperties.candleStyle.borderDownColor':'#f6465d',
+     'mainSeriesProperties.candleStyle.wickUpColor':'#0ecb81',
+     'mainSeriesProperties.candleStyle.wickDownColor':'#f6465d'
+   }
+ });
+}
+
+function loadSymbol(s){
+ const value=(s||document.getElementById('symbol').value).trim().toUpperCase();
+ document.getElementById('symbol').value=value;
+ if(tv && tv.setSymbol){tv.setSymbol(value,'15');}
+ else create(value);
+}
+
+function resetChart(){
+ if(!tv)return;
+ try{
+   if(tv.chart && tv.chart().resetData){tv.chart().resetData();}
+   if(tv.activeChart && tv.activeChart().resetData){tv.activeChart().resetData();}
+ }catch(e){}
+ /* Public widget does not expose the full Advanced Charts reset-view API.
+    Reloading the widget gives a clean view while preserving the symbol. */
+ const s=document.getElementById('symbol').value;
+ document.getElementById('chart').innerHTML='';
+ create(s);
+}
+
+function setChartColor(color){
+ bg=color;
+ if(!tv)return;
+ try{
+   if(tv.applyOverrides){
+     tv.applyOverrides({
+       'paneProperties.backgroundType':'solid',
+       'paneProperties.background':color,
+       'paneProperties.vertGridProperties.color':grid?'#1b2027':color,
+       'paneProperties.horzGridProperties.color':grid?'#1b2027':color
+     });
+   }
+ }catch(e){
+   const s=document.getElementById('symbol').value;
+   document.getElementById('chart').innerHTML='';
+   create(s);
+ }
+}
+
+function toggleGrid(){
+ grid=!grid;
+ setChartColor(bg);
+}
+
+function toggleCandle(){
+ candleStyle=candleStyle===1?3:1;
+ try{
+   tv.applyOverrides({'mainSeriesProperties.style':candleStyle});
+ }catch(e){}
 }
 
 document.getElementById('symbol').addEventListener('keydown',e=>{
-  if(e.key==="Enter")loadSymbol();
+ if(e.key==='Enter')loadSymbol();
 });
 
-create("BINANCE:BTCUSDT");
+create('BINANCE:BTCUSDT');
 </script>
 </body>
 </html>
