@@ -1,120 +1,1867 @@
-async function sendAI(message, mode = "analyze") {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SMC AI Scanner</title>
 
-    try {
+<style>
+*{box-sizing:border-box}
 
-        const symbol = currentSymbol || "BTCUSDT";
-
-        /*
-         * Get the currently selected timeframe.
-         * Change this selector if your existing chart uses another ID.
-         */
-        const timeframe =
-            document.querySelector(".timeframe.active")?.dataset?.interval ||
-            window.currentInterval ||
-            "15m";
-
-        /*
-         * Ask Binance for REAL candle data.
-         */
-        const binanceInterval = timeframe;
-
-        const response = await fetch(
-            `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${binanceInterval}&limit=300`
-        );
-
-        if (!response.ok) {
-            throw new Error("Binance candle request failed");
-        }
-
-        const raw = await response.json();
-
-        /*
-         * Convert Binance candles into clean OHLCV data.
-         */
-        const candles = raw.map((c, i) => ({
-            index: i,
-            time: Number(c[0]),
-            open: Number(c[1]),
-            high: Number(c[2]),
-            low: Number(c[3]),
-            close: Number(c[4]),
-            volume: Number(c[5])
-        }));
-
-        /*
-         * Send REAL chart data to our AI backend.
-         */
-        const aiResponse = await fetch("/api/ai", {
-
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-
-                mode: mode,
-
-                message: message,
-
-                symbol: symbol,
-
-                timeframe: binanceInterval,
-
-                candles: candles
-
-            })
-
-        });
-
-        const result = await aiResponse.json();
-
-        if (!aiResponse.ok) {
-            throw new Error(
-                result.error || "AI request failed"
-            );
-        }
-
-        /*
-         * Display AI answer.
-         */
-        const answer =
-            result.answer ||
-            result.response ||
-            "AI returned no answer.";
-
-        /*
-         * Use your existing AI output element here.
-         */
-        const aiOutput =
-            document.getElementById("aiResponse") ||
-            document.getElementById("ai-output") ||
-            document.getElementById("aiResult");
-
-        if (aiOutput) {
-            aiOutput.innerText = answer;
-        }
-
-        return answer;
-
-    } catch (error) {
-
-        console.error("AI ERROR:", error);
-
-        const aiOutput =
-            document.getElementById("aiResponse") ||
-            document.getElementById("ai-output") ||
-            document.getElementById("aiResult");
-
-        if (aiOutput) {
-
-            aiOutput.innerText =
-                "AI connection error: " +
-                error.message;
-
-        }
-
-        return null;
-    }
+body{
+ margin:0;
+ background:#0b0e11;
+ color:#eaecef;
+ font-family:Arial,Helvetica,sans-serif;
+ overflow:hidden
 }
+
+button{font-family:inherit}
+
+.header{
+ height:58px;
+ background:#181a20;
+ border-bottom:1px solid #2b2f36;
+ display:flex;
+ align-items:center;
+ padding:0 18px;
+ gap:24px
+}
+
+.logo{
+ font-size:20px;
+ font-weight:bold;
+ color:#f0b90b;
+ white-space:nowrap
+}
+
+.market-tabs{display:flex;gap:8px}
+
+.market-tabs button{
+ background:transparent;
+ border:0;
+ color:#848e9c;
+ padding:9px 15px;
+ cursor:pointer;
+ font-weight:bold
+}
+
+.market-tabs button.active{
+ color:#f0b90b;
+ border-bottom:2px solid #f0b90b
+}
+
+.search{margin-left:auto}
+
+.search input{
+ width:190px;
+ background:#2b2f36;
+ border:1px solid #3b4048;
+ color:white;
+ padding:9px 12px;
+ border-radius:6px;
+ outline:none
+}
+
+.main{
+ display:grid;
+ grid-template-columns:220px minmax(500px,1fr) 320px;
+ height:calc(100vh - 58px)
+}
+
+.sidebar{
+ background:#161a1e;
+ border-right:1px solid #2b2f36;
+ overflow-y:auto
+}
+
+.sidebar-title{
+ padding:16px;
+ font-size:13px;
+ color:#848e9c;
+ border-bottom:1px solid #2b2f36
+}
+
+.coin{
+ padding:12px 16px;
+ display:flex;
+ justify-content:space-between;
+ cursor:pointer;
+ border-bottom:1px solid #20242a
+}
+
+.coin:hover,.coin.active{background:#1e2329}
+
+.coin-name{font-weight:bold}
+.coin-price{color:#d1d4dc}
+
+.chart-area{
+ min-width:0;
+ background:#0b0e11
+}
+
+.chart-header{
+ height:112px;
+ padding:12px 18px;
+ border-bottom:1px solid #2b2f36
+}
+
+.pair{font-size:20px;font-weight:bold}
+
+.live-price{
+ color:#0ecb81;
+ font-size:22px;
+ margin-left:15px
+}
+
+.stats{
+ display:flex;
+ gap:25px;
+ margin-top:9px;
+ color:#848e9c;
+ font-size:12px
+}
+
+.timeframes{
+ display:flex;
+ gap:4px;
+ margin-top:14px
+}
+
+.timeframes button{
+ border:0;
+ background:transparent;
+ color:#848e9c;
+ padding:5px 10px;
+ cursor:pointer
+}
+
+.timeframes button:hover,
+.timeframes button.active{
+ color:#f0b90b;
+ background:#2b2f36;
+ border-radius:4px
+}
+
+.chart-wrapper{
+ position:relative;
+ height:calc(100% - 112px)
+}
+
+#chart{
+ width:100%;
+ height:100%;
+ display:block
+}
+
+.smc-panel{
+ position:absolute;
+ top:12px;
+ left:15px;
+ background:rgba(22,26,30,.94);
+ border:1px solid #30353d;
+ border-radius:6px;
+ padding:10px 13px;
+ font-size:12px;
+ min-width:190px
+}
+
+.smc-title{
+ color:#f0b90b;
+ font-weight:bold;
+ margin-bottom:7px
+}
+
+.smc-row{
+ display:flex;
+ justify-content:space-between;
+ margin:5px 0
+}
+
+.ok{color:#0ecb81}
+.wait{color:#f0b90b}
+.bad{color:#f6465d}
+
+.rightbar{
+ background:#161a1e;
+ border-left:1px solid #2b2f36;
+ overflow-y:auto
+}
+
+.right-title{
+ padding:16px;
+ font-weight:bold;
+ border-bottom:1px solid #2b2f36
+}
+
+.orderbook{padding:12px}
+
+.book-row{
+ display:grid;
+ grid-template-columns:1fr 1fr 1fr;
+ font-size:11px;
+ padding:3px 0;
+ color:#b7bdc6
+}
+
+.book-header{
+ color:#5e6673;
+ margin-bottom:7px
+}
+
+.ask{color:#f6465d}
+.bid{color:#0ecb81}
+
+.signal{
+ margin:15px 12px;
+ padding:14px;
+ background:#1e2329;
+ border:1px solid #30353d;
+ border-radius:7px
+}
+
+.signal-title{
+ color:#f0b90b;
+ font-weight:bold;
+ margin-bottom:10px
+}
+
+.signal-status{
+ font-size:18px;
+ font-weight:bold;
+ color:#0ecb81
+}
+
+.ai-box{
+ margin:12px;
+ background:#1e2329;
+ border:1px solid #30353d;
+ border-radius:8px;
+ overflow:hidden
+}
+
+.ai-header{
+ padding:12px;
+ background:#181a20;
+ color:#f0b90b;
+ font-weight:bold
+}
+
+.ai-info{
+ padding:10px 12px;
+ font-size:11px;
+ color:#848e9c;
+ border-bottom:1px solid #30353d
+}
+
+.ai-input{
+ width:100%;
+ min-height:90px;
+ resize:vertical;
+ background:#0b0e11;
+ color:#eaecef;
+ border:0;
+ border-bottom:1px solid #30353d;
+ padding:10px;
+ outline:none
+}
+
+.ai-buttons{
+ display:flex;
+ gap:6px;
+ padding:8px
+}
+
+.ai-buttons button{
+ flex:1;
+ border:0;
+ border-radius:5px;
+ padding:9px 5px;
+ cursor:pointer;
+ background:#2b2f36;
+ color:#eaecef
+}
+
+.ai-buttons button.primary{
+ background:#f0b90b;
+ color:#111;
+ font-weight:bold
+}
+
+.ai-answer{
+ padding:12px;
+ min-height:100px;
+ max-height:330px;
+ overflow:auto;
+ white-space:pre-wrap;
+ font-size:12px;
+ line-height:1.5
+}
+
+.ai-status{
+ padding:7px 12px;
+ font-size:10px;
+ color:#848e9c;
+ border-top:1px solid #30353d
+}
+
+.footer{
+ position:fixed;
+ bottom:0;
+ left:220px;
+ right:320px;
+ background:rgba(24,26,32,.95);
+ border-top:1px solid #2b2f36;
+ padding:7px 15px;
+ font-size:11px;
+ color:#848e9c
+}
+
+@media(max-width:900px){
+ .main{grid-template-columns:1fr}
+ .sidebar,.rightbar{display:none}
+ .footer{left:0;right:0}
+ .search{display:none}
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+
+<div class="logo">SMC AI SCANNER</div>
+
+<div class="market-tabs">
+<button class="active" onclick="setMarket('SPOT',this)">Spot</button>
+<button onclick="setMarket('FUTURES',this)">Futures</button>
+</div>
+
+<div class="search">
+<input
+ id="search"
+ placeholder="Search symbol..."
+ onkeyup="searchCoins()">
+</div>
+
+</header>
+
+
+<div class="main">
+
+<aside class="sidebar">
+
+<div class="sidebar-title">MARKETS</div>
+
+<div id="coinList">
+
+<div class="coin active"
+ data-symbol="BTCUSDT"
+ onclick="selectCoin('BTCUSDT')">
+<span class="coin-name">BTC/USDT</span>
+<span class="coin-price" id="price-BTCUSDT">--</span>
+</div>
+
+<div class="coin"
+ data-symbol="ETHUSDT"
+ onclick="selectCoin('ETHUSDT')">
+<span class="coin-name">ETH/USDT</span>
+<span class="coin-price" id="price-ETHUSDT">--</span>
+</div>
+
+<div class="coin"
+ data-symbol="SOLUSDT"
+ onclick="selectCoin('SOLUSDT')">
+<span class="coin-name">SOL/USDT</span>
+<span class="coin-price" id="price-SOLUSDT">--</span>
+</div>
+
+<div class="coin"
+ data-symbol="AVAXUSDT"
+ onclick="selectCoin('AVAXUSDT')">
+<span class="coin-name">AVAX/USDT</span>
+<span class="coin-price" id="price-AVAXUSDT">--</span>
+</div>
+
+<div class="coin"
+ data-symbol="SEIUSDT"
+ onclick="selectCoin('SEIUSDT')">
+<span class="coin-name">SEI/USDT</span>
+<span class="coin-price" id="price-SEIUSDT">--</span>
+</div>
+
+<div class="coin"
+ data-symbol="TIAUSDT"
+ onclick="selectCoin('TIAUSDT')">
+<span class="coin-name">TIA/USDT</span>
+<span class="coin-price" id="price-TIAUSDT">--</span>
+</div>
+
+<div class="coin"
+ data-symbol="API3USDT"
+ onclick="selectCoin('API3USDT')">
+<span class="coin-name">API3/USDT</span>
+<span class="coin-price" id="price-API3USDT">--</span>
+</div>
+
+</div>
+</aside>
+
+
+<section class="chart-area">
+
+<div class="chart-header">
+
+<div>
+<span class="pair" id="pair">BTC/USDT</span>
+<span class="live-price" id="livePrice">--</span>
+</div>
+
+<div class="stats">
+
+<span>
+24h Change
+<b id="change">--</b>
+</span>
+
+<span>
+24h High
+<b id="high">--</b>
+</span>
+
+<span>
+24h Low
+<b id="low">--</b>
+</span>
+
+</div>
+
+
+<div class="timeframes">
+
+<button onclick="changeTF('1m',this)">1m</button>
+<button onclick="changeTF('5m',this)">5m</button>
+
+<button class="active"
+onclick="changeTF('15m',this)">
+15m
+</button>
+
+<button onclick="changeTF('30m',this)">30m</button>
+<button onclick="changeTF('1h',this)">1H</button>
+<button onclick="changeTF('4h',this)">4H</button>
+<button onclick="changeTF('1d',this)">1D</button>
+<button onclick="changeTF('1w',this)">1W</button>
+
+</div>
+
+</div>
+
+
+<div class="chart-wrapper">
+
+<canvas id="chart"></canvas>
+
+<div class="smc-panel">
+
+<div class="smc-title">
+SMC AI ANALYSIS
+</div>
+
+<div class="smc-row">
+<span>Liquidity Sweep</span>
+<span class="wait" id="sweep">WAIT</span>
+</div>
+
+<div class="smc-row">
+<span>CHoCH / MSS</span>
+<span class="wait" id="choch">WAIT</span>
+</div>
+
+<div class="smc-row">
+<span>BOS</span>
+<span class="wait" id="bos">WAIT</span>
+</div>
+
+<div class="smc-row">
+<span>FVG / OB</span>
+<span class="wait" id="fvg">WAIT</span>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<aside class="rightbar">
+
+<div class="right-title">
+ORDER BOOK
+</div>
+
+<div class="orderbook">
+
+<div class="book-row book-header">
+<span>Price</span>
+<span>Amount</span>
+<span>Total</span>
+</div>
+
+<div id="asks"></div>
+
+<div style="height:12px"></div>
+
+<div id="bids"></div>
+
+</div>
+
+
+<div class="signal">
+
+<div class="signal-title">
+SMC AI SIGNAL
+</div>
+
+<div class="signal-status" id="signal">
+SCANNING...
+</div>
+
+<p id="signalText">
+Waiting for SMC confirmation.
+</p>
+
+</div>
+
+
+<div class="ai-box">
+
+<div class="ai-header">
+🤖 SMC AI — DIRECT CHART ACCESS
+</div>
+
+<div class="ai-info">
+AI receives the actual OHLCV candles currently loaded
+on this chart.
+</div>
+
+<textarea
+id="prompt"
+class="ai-input"
+placeholder="Example: Analyze the current BTCUSDT chart using my SMC methodology."></textarea>
+
+<div class="ai-buttons">
+
+<button onclick="askAI()">
+Ask AI
+</button>
+
+<button class="primary"
+onclick="analyzeChartAI()">
+Analyze Chart
+</button>
+
+</div>
+
+<div id="aiAnswer" class="ai-answer">
+AI ready.
+</div>
+
+<div id="aiStatus" class="ai-status">
+Chart data: waiting...
+</div>
+
+</div>
+
+</aside>
+
+</div>
+
+
+<div class="footer">
+SMC AI Scanner • Live Binance market data • Analysis tool only
+</div>
+
+
+<script>
+
+let currentSymbol="BTCUSDT";
+let currentTF="15m";
+
+let socket=null;
+let depthSocket=null;
+
+let candles=[];
+
+
+const canvas=
+document.getElementById("chart");
+
+const ctx=
+canvas.getContext("2d");
+
+
+/* =========================================
+   CANVAS
+========================================= */
+
+function resizeCanvas(){
+
+ const rect=
+ canvas.getBoundingClientRect();
+
+ const dpr=
+ window.devicePixelRatio||1;
+
+ canvas.width=
+ rect.width*dpr;
+
+ canvas.height=
+ rect.height*dpr;
+
+ ctx.setTransform(
+ dpr,0,0,dpr,0,0
+ );
+
+ drawChart();
+
+}
+
+window.addEventListener(
+"resize",
+resizeCanvas
+);
+
+
+/* =========================================
+   PRICE
+========================================= */
+
+function formatPrice(p){
+
+ if(!Number.isFinite(p))
+ return "--";
+
+ if(p>=1000)
+ return p.toLocaleString(
+ undefined,
+ {maximumFractionDigits:2}
+ );
+
+ if(p>=1)
+ return p.toFixed(4);
+
+ return p.toFixed(6);
+
+}
+
+
+function updatePrice(price){
+
+ document.getElementById(
+ "livePrice"
+ ).innerText=
+ formatPrice(price);
+
+ const el=
+ document.getElementById(
+ "price-"+currentSymbol
+ );
+
+ if(el)
+ el.innerText=
+ formatPrice(price);
+
+}
+
+
+/* =========================================
+   BINANCE HISTORY
+========================================= */
+
+async function loadHistory(){
+
+ try{
+
+ const url=
+ `https://api.binance.com/api/v3/klines?symbol=${currentSymbol}&interval=${currentTF}&limit=300`;
+
+ const res=
+ await fetch(url);
+
+ if(!res.ok)
+ throw new Error(
+ "Kline request failed"
+ );
+
+ const data=
+ await res.json();
+
+ candles=
+ data.map(k=>({
+
+ time:k[0],
+
+ open:+k[1],
+
+ high:+k[2],
+
+ low:+k[3],
+
+ close:+k[4],
+
+ volume:+k[5]
+
+ }));
+
+ if(candles.length){
+
+ updatePrice(
+ candles[candles.length-1].close
+ );
+
+ detectSMC();
+
+ drawChart();
+
+ updateAIStatus();
+
+ }
+
+ }catch(e){
+
+ console.error(e);
+
+ drawMessage(
+ "Unable to load chart data"
+ );
+
+ }
+
+}
+
+
+/* =========================================
+   24H STATS
+========================================= */
+
+async function loadStats(){
+
+ try{
+
+ const r=
+ await fetch(
+ `https://api.binance.com/api/v3/ticker/24hr?symbol=${currentSymbol}`
+ );
+
+ const d=
+ await r.json();
+
+ const change=
+ +d.priceChangePercent;
+
+ document.getElementById(
+ "change"
+ ).innerText=
+ change.toFixed(2)+"%";
+
+ document.getElementById(
+ "change"
+ ).style.color=
+ change>=0
+ ?" #0ecb81"
+ :"#f6465d";
+
+ document.getElementById(
+ "high"
+ ).innerText=
+ formatPrice(+d.highPrice);
+
+ document.getElementById(
+ "low"
+ ).innerText=
+ formatPrice(+d.lowPrice);
+
+ }catch(e){
+
+ console.error(e);
+
+ }
+
+}
+
+
+/* =========================================
+   LIVE BINANCE WEBSOCKET
+========================================= */
+
+function connectMarket(){
+
+ if(socket)
+ socket.close();
+
+ if(depthSocket)
+ depthSocket.close();
+
+
+ socket=
+ new WebSocket(
+ `wss://stream.binance.com:9443/ws/${currentSymbol.toLowerCase()}@kline_${currentTF}`
+ );
+
+
+ socket.onopen=()=>{
+
+ console.log(
+ "Binance market connected"
+ );
+
+ };
+
+
+ socket.onmessage=e=>{
+
+ const d=
+ JSON.parse(e.data);
+
+ if(!d.k)
+ return;
+
+ const k=d.k;
+
+ const c={
+
+ open:+k.o,
+ high:+k.h,
+ low:+k.l,
+ close:+k.c,
+ volume:+k.v,
+ time:k.t
+
+ };
+
+
+ const last=
+ candles[candles.length-1];
+
+
+ if(
+ last &&
+ last.time===c.time
+ ){
+
+ candles[
+ candles.length-1
+ ]=c;
+
+ }else{
+
+ candles.push(c);
+
+ }
+
+
+ if(candles.length>300)
+ candles.shift();
+
+
+ updatePrice(c.close);
+
+ detectSMC();
+
+ drawChart();
+
+ updateAIStatus();
+
+ };
+
+
+ socket.onerror=()=>{
+ console.log(
+ "Market websocket error"
+ );
+ };
+
+
+ /* ORDER BOOK */
+
+ depthSocket=
+ new WebSocket(
+ `wss://stream.binance.com:9443/ws/${currentSymbol.toLowerCase()}@depth10@100ms`
+ );
+
+ depthSocket.onmessage=e=>{
+ renderOrderBook(
+ JSON.parse(e.data)
+ );
+ };
+
+
+ loadStats();
+
+}
+
+
+/* =========================================
+   ORDER BOOK
+========================================= */
+
+function renderOrderBook(d){
+
+ const asks=
+ (d.asks||[]).slice(0,7);
+
+ const bids=
+ (d.bids||[]).slice(0,7);
+
+
+ const make=(arr,cls)=>
+
+ arr.map(x=>`
+
+ <div class="book-row">
+
+ <span class="${cls}">
+ ${formatPrice(+x[0])}
+ </span>
+
+ <span>
+ ${(+x[1]).toFixed(4)}
+ </span>
+
+ <span>
+ ${(+x[0]*+x[1]).toFixed(2)}
+ </span>
+
+ </div>
+
+ `).join("");
+
+
+ document.getElementById(
+ "asks"
+ ).innerHTML=
+ make(asks,"ask");
+
+
+ document.getElementById(
+ "bids"
+ ).innerHTML=
+ make(bids,"bid");
+
+}
+
+
+/* =========================================
+   DRAW MESSAGE
+========================================= */
+
+function drawMessage(msg){
+
+ const w=
+ canvas.clientWidth;
+
+ const h=
+ canvas.clientHeight;
+
+ ctx.clearRect(
+ 0,0,w,h
+ );
+
+ ctx.fillStyle="#0b0e11";
+
+ ctx.fillRect(
+ 0,0,w,h
+ );
+
+ ctx.fillStyle="#848e9c";
+
+ ctx.font="14px Arial";
+
+ ctx.fillText(
+ msg,
+ 30,
+ 40
+ );
+
+}
+
+
+/* =========================================
+   DRAW CHART
+========================================= */
+
+function drawChart(){
+
+ const width=
+ canvas.clientWidth;
+
+ const height=
+ canvas.clientHeight;
+
+
+ if(width<=0||height<=0)
+ return;
+
+
+ ctx.clearRect(
+ 0,0,width,height
+ );
+
+
+ ctx.fillStyle=
+ "#0b0e11";
+
+ ctx.fillRect(
+ 0,0,width,height
+ );
+
+
+ if(candles.length<2){
+
+ drawMessage(
+ "Loading live chart..."
+ );
+
+ return;
+
+ }
+
+
+ const visible=
+ candles.slice(-120);
+
+
+ let min=
+ Math.min(
+ ...visible.map(c=>c.low)
+ );
+
+ let max=
+ Math.max(
+ ...visible.map(c=>c.high)
+ );
+
+
+ const pad=
+ (max-min)*.08||1;
+
+ min-=pad;
+ max+=pad;
+
+
+ const chartHeight=
+ height-45;
+
+
+ const y=
+ p=>
+ chartHeight-
+ ((p-min)/(max-min))*
+ chartHeight;
+
+
+ const gap=
+ width/visible.length;
+
+ const cw=
+ Math.max(
+ 3,
+ gap*.62
+ );
+
+
+ /* GRID */
+
+ ctx.strokeStyle="#1c2026";
+
+ ctx.lineWidth=1;
+
+
+ for(let i=0;i<7;i++){
+
+ let gy=
+ chartHeight/6*i;
+
+ ctx.beginPath();
+
+ ctx.moveTo(
+ 0,
+ gy
+ );
+
+ ctx.lineTo(
+ width,
+ gy
+ );
+
+ ctx.stroke();
+
+ }
+
+
+ /* CANDLES */
+
+ visible.forEach((c,i)=>{
+
+ const x=
+ i*gap+gap/2;
+
+ const openY=
+ y(c.open);
+
+ const closeY=
+ y(c.close);
+
+ const bullish=
+ c.close>=c.open;
+
+
+ ctx.strokeStyle=
+ bullish
+ ?"#0ecb81"
+ :"#f6465d";
+
+ ctx.fillStyle=
+ ctx.strokeStyle;
+
+
+ ctx.beginPath();
+
+ ctx.moveTo(
+ x,
+ y(c.high)
+ );
+
+ ctx.lineTo(
+ x,
+ y(c.low)
+ );
+
+ ctx.stroke();
+
+
+ ctx.fillRect(
+
+ x-cw/2,
+
+ Math.min(
+ openY,
+ closeY
+ ),
+
+ cw,
+
+ Math.max(
+ 1,
+ Math.abs(
+ closeY-openY
+ )
+ )
+
+ );
+
+ });
+
+
+ /* PRICE SCALE */
+
+ ctx.fillStyle="#848e9c";
+
+ ctx.font="10px Arial";
+
+
+ for(let i=0;i<7;i++){
+
+ const price=
+ max-
+ (max-min)/6*i;
+
+ const py=
+ chartHeight/6*i+12;
+
+
+ ctx.fillText(
+ formatPrice(price),
+ Math.max(0,width-78),
+ py
+ );
+
+ }
+
+}
+
+
+/* =========================================
+   SIMPLE SMC
+========================================= */
+
+function setStatus(
+ id,
+ text,
+ cls
+){
+
+ const e=
+ document.getElementById(id);
+
+ e.innerText=text;
+
+ e.className=cls;
+
+}
+
+
+function detectSMC(){
+
+ if(candles.length<20)
+ return;
+
+
+ const c=
+ candles[candles.length-1];
+
+
+ const prev=
+ candles.slice(-11,-1);
+
+
+ const ph=
+ Math.max(
+ ...prev.map(x=>x.high)
+ );
+
+
+ const pl=
+ Math.min(
+ ...prev.map(x=>x.low)
+ );
+
+
+ const recent5=
+ candles.slice(-6,-1);
+
+
+ const rh=
+ Math.max(
+ ...recent5.map(x=>x.high)
+ );
+
+
+ const rl=
+ Math.min(
+ ...recent5.map(x=>x.low)
+ );
+
+
+ setStatus(
+ "sweep",
+ "WAIT",
+ "wait"
+ );
+
+ setStatus(
+ "choch",
+ "WAIT",
+ "wait"
+ );
+
+ setStatus(
+ "bos",
+ "WAIT",
+ "wait"
+ );
+
+ setStatus(
+ "fvg",
+ "WAIT",
+ "wait"
+ );
+
+
+ if(
+ c.low<rl &&
+ c.close>rl
+ ){
+
+ setStatus(
+ "sweep",
+ "BULLISH",
+ "ok"
+ );
+
+ }
+
+ else if(
+ c.high>rh &&
+ c.close<rh
+ ){
+
+ setStatus(
+ "sweep",
+ "BEARISH",
+ "bad"
+ );
+
+ }
+
+
+ if(c.close>ph){
+
+ setStatus(
+ "choch",
+ "BULLISH",
+ "ok"
+ );
+
+ setStatus(
+ "bos",
+ "BULLISH",
+ "ok"
+ );
+
+ document.getElementById(
+ "signal"
+ ).innerText=
+ "🟢 BULLISH";
+
+ document.getElementById(
+ "signalText"
+ ).innerText=
+ "Potential bullish structure break detected.";
+
+ }
+
+ else if(c.close<pl){
+
+ setStatus(
+ "choch",
+ "BEARISH",
+ "bad"
+ );
+
+ setStatus(
+ "bos",
+ "BEARISH",
+ "bad"
+ );
+
+ document.getElementById(
+ "signal"
+ ).innerText=
+ "🔴 BEARISH";
+
+ document.getElementById(
+ "signalText"
+ ).innerText=
+ "Potential bearish structure break detected.";
+
+ }
+
+ else{
+
+ document.getElementById(
+ "signal"
+ ).innerText=
+ "SCANNING...";
+
+ document.getElementById(
+ "signalText"
+ ).innerText=
+ "Waiting for SMC confirmation.";
+
+ }
+
+
+ const a=
+ candles[candles.length-3];
+
+ const b=
+ candles[candles.length-2];
+
+
+ if(
+ a &&
+ b &&
+ c.low>b.high
+ ){
+
+ setStatus(
+ "fvg",
+ "BULLISH",
+ "ok"
+ );
+
+ }
+
+
+ if(
+ a &&
+ b &&
+ c.high<b.low
+ ){
+
+ setStatus(
+ "fvg",
+ "BEARISH",
+ "bad"
+ );
+
+ }
+
+}
+
+
+/* =========================================
+   DIRECT AI CHART ACCESS
+========================================= */
+
+function getAIChartData(){
+
+ if(
+ !Array.isArray(candles) ||
+ candles.length===0
+ ){
+
+ throw new Error(
+ "Chart data is not loaded yet."
+ );
+
+ }
+
+
+ return {
+
+ symbol:currentSymbol,
+
+ timeframe:currentTF,
+
+ currentPrice:
+ candles[candles.length-1].close,
+
+ candles:candles.map(
+ (c,index)=>({
+
+ index:index,
+
+ time:Number(c.time),
+
+ open:Number(c.open),
+
+ high:Number(c.high),
+
+ low:Number(c.low),
+
+ close:Number(c.close),
+
+ volume:Number(c.volume)
+
+ })
+ )
+
+ };
+
+}
+
+
+/* =========================================
+   AI STATUS
+========================================= */
+
+function updateAIStatus(){
+
+ const el=
+ document.getElementById(
+ "aiStatus"
+ );
+
+ if(!el)
+ return;
+
+
+ if(!candles.length){
+
+ el.innerText=
+ "Chart data: waiting...";
+
+ return;
+
+ }
+
+
+ el.innerText=
+ `Chart data: ${currentSymbol} • ${currentTF} • ${candles.length} candles • AI can read this data`;
+
+}
+
+
+/* =========================================
+   SEND TO AI
+========================================= */
+
+async function sendAI(
+ message,
+ mode="analyze"
+){
+
+ const answer=
+ document.getElementById(
+ "aiAnswer"
+ );
+
+ const status=
+ document.getElementById(
+ "aiStatus"
+ );
+
+
+ try{
+
+ const chart=
+ getAIChartData();
+
+
+ status.innerText=
+ "AI is reading the live chart candles...";
+
+
+ answer.innerText=
+ "Analyzing...";
+
+
+ const response=
+ await fetch(
+ "/api/ai",
+ {
+
+ method:"POST",
+
+ headers:{
+ "Content-Type":
+ "application/json"
+ },
+
+ body:JSON.stringify({
+
+ mode:mode,
+
+ message:message,
+
+ chart:chart
+
+ })
+
+ }
+ );
+
+
+ const result=
+ await response.json();
+
+
+ if(!response.ok){
+
+ throw new Error(
+ result.error ||
+ "AI server error"
+ );
+
+ }
+
+
+ answer.innerText=
+ result.answer ||
+ "AI returned no answer.";
+
+
+ status.innerText=
+ `AI accessed ${chart.symbol} ${chart.timeframe} • ${chart.candles.length} candles`;
+
+
+ return result.answer;
+
+
+ }catch(error){
+
+ console.error(
+ "AI ERROR:",
+ error
+ );
+
+
+ answer.innerText=
+ "AI error: "+
+ error.message;
+
+
+ status.innerText=
+ "AI connection failed.";
+
+ }
+
+}
+
+
+/* =========================================
+   ASK AI
+========================================= */
+
+function askAI(){
+
+ const prompt=
+ document.getElementById(
+ "prompt"
+ ).value.trim();
+
+
+ const message=
+ prompt ||
+ `Analyze ${currentSymbol} on the ${currentTF} timeframe using my SMC methodology.`;
+
+ sendAI(
+ message,
+ "chat"
+ );
+
+}
+
+
+/* =========================================
+   ANALYZE CURRENT CHART
+========================================= */
+
+function analyzeChartAI(){
+
+ const message=`
+
+Analyze the CURRENT ${currentSymbol}
+${currentTF} chart using my SMC methodology.
+
+Use the actual OHLCV candles supplied
+by the chart.
+
+Check:
+
+1. Major swing high
+2. Major swing low
+3. Buy-side liquidity
+4. Sell-side liquidity
+5. Liquidity sweep / SFP
+6. Displacement
+7. CHoCH / MSS
+8. BOS
+9. FVG
+10. Order Block
+11. Retracement
+12. Current market bias
+
+Do not invent data.
+
+If confirmation is incomplete,
+say WAIT.
+
+`;
+
+ sendAI(
+ message,
+ "analyze"
+ );
+
+}
+
+
+/* =========================================
+   COIN
+========================================= */
+
+function selectCoin(symbol){
+
+ currentSymbol=
+ symbol;
+
+
+ document
+ .querySelectorAll(".coin")
+ .forEach(
+ c=>c.classList.remove("active")
+ );
+
+
+ const selected=
+ document.querySelector(
+ `[data-symbol="${symbol}"]`
+ );
+
+
+ if(selected)
+ selected.classList.add("active");
+
+
+ document.getElementById(
+ "pair"
+ ).innerText=
+ symbol.replace(
+ "USDT",
+ "/USDT"
+ );
+
+
+ candles=[];
+
+
+ drawMessage(
+ "Loading live chart..."
+ );
+
+
+ loadHistory();
+
+ connectMarket();
+
+ updateAIStatus();
+
+}
+
+
+/* =========================================
+   TIMEFRAME
+========================================= */
+
+function changeTF(
+ tf,
+ button
+){
+
+ currentTF=tf;
+
+
+ document
+ .querySelectorAll(
+ ".timeframes button"
+ )
+ .forEach(
+ b=>b.classList.remove("active")
+ );
+
+
+ button.classList.add("active");
+
+
+ candles=[];
+
+
+ drawMessage(
+ "Loading live chart..."
+ );
+
+
+ loadHistory();
+
+ connectMarket();
+
+ updateAIStatus();
+
+}
+
+
+/* =========================================
+   MARKET
+========================================= */
+
+function setMarket(
+ type,
+ button
+){
+
+ document
+ .querySelectorAll(
+ ".market-tabs button"
+ )
+ .forEach(
+ b=>b.classList.remove("active")
+ );
+
+
+ button.classList.add("active");
+
+
+ if(type==="FUTURES"){
+
+ alert(
+ "Futures terminal selected. Futures data engine will be connected next."
+ );
+
+ }
+
+}
+
+
+/* =========================================
+   SEARCH
+========================================= */
+
+function searchCoins(){
+
+ const s=
+ document.getElementById(
+ "search"
+ ).value.toUpperCase();
+
+
+ document
+ .querySelectorAll(".coin")
+ .forEach(
+ c=>
+ c.style.display=
+ c.innerText
+ .toUpperCase()
+ .includes(s)
+ ?"flex"
+ :"none"
+ );
+
+}
+
+
+/* =========================================
+   ENTER TO SEND AI
+========================================= */
+
+document
+.getElementById("prompt")
+.addEventListener(
+ "keydown",
+ function(e){
+
+ if(
+ e.key==="Enter" &&
+ !e.shiftKey
+ ){
+
+ e.preventDefault();
+
+ askAI();
+
+ }
+
+ }
+);
+
+
+/* =========================================
+   START
+========================================= */
+
+resizeCanvas();
+
+loadHistory();
+
+connectMarket();
+
+updateAIStatus();
+
+</script>
+
+</body>
+</html>
