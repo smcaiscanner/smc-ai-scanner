@@ -1,101 +1,61 @@
-async function sendAI(message, type = "analyze") {
-
-    const answerBox = document.getElementById("answer");
-
-    if (answerBox) {
-        answerBox.textContent =
-            "🤖 AI is reading the current chart...";
-    }
-
-    /*
-    =====================================================
-    GET CURRENT CHART INFORMATION
-    =====================================================
-    */
-
-    const chartData = {
-
-        symbol:
-            typeof currentSymbol !== "undefined"
-                ? currentSymbol
-                : "",
-
-        timeframe:
-            typeof currentTimeframe !== "undefined"
-                ? currentTimeframe
-                : "",
-
-        message: message,
-
-        type: type
-
-    };
-
-
-    /*
-    =====================================================
-    SEND CHART + USER MESSAGE TO AI BACKEND
-    =====================================================
-    */
-
-    try {
-
-        const response = await fetch(
-            "/api/ai",
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
-
-                body: JSON.stringify(
-                    chartData
-                )
-            }
-        );
-
-
-        const data =
-            await response.json();
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                data.error ||
-                "AI request failed"
-            );
-
-        }
-
-
-        if (answerBox) {
-
-            answerBox.textContent =
-                data.answer ||
-                "AI returned no answer.";
-
-        }
-
-
-    } catch (error) {
-
-        console.error(
-            "AI ERROR:",
-            error
-        );
-
-
-        if (answerBox) {
-
-            answerBox.textContent =
-                "AI Error: " +
-                error.message;
-
-        }
-
-    }
+sendAI(
+        message,
+        "analyze"
+    );
 
 }
+
+
+/* =========================
+   ENTER TO SEND
+========================= */
+
+document
+    .getElementById("symbol")
+    .addEventListener(
+        "keydown",
+        function(e) {
+
+            if (e.key === "Enter") {
+
+                loadSymbol();
+
+            }
+
+        }
+    );
+
+
+document
+    .getElementById("prompt")
+    .addEventListener(
+        "keydown",
+        function(e) {
+
+            if (
+                e.key === "Enter" &&
+                !e.shiftKey
+            ) {
+
+                e.preventDefault();
+
+                askAI();
+
+            }
+
+        }
+    );
+
+
+/* =========================
+   START
+========================= */
+
+createChart(
+    currentSymbol
+);
+
+</script>
+
+</body>
+</html>
