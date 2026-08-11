@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMC AI Scanner</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #0b0e11;
+    color: #eaecef;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
+}
+
+button {
+    font-family: inherit;
+}
+
+.header {
+    height: 58px;
+    background: #181a20;
+    border-bottom: 1px solid #2b2f36;
+    display: flex;
+    align-items: center;
+    padding: 0 18px;
+    gap: 24px;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+    color: #f0b90b;
+    white-space: nowrap;
+}
+
+.market-tabs {
+    display: flex;
+    gap: 8px;
+}
+
+.market-tabs button {
+    background: transparent;
+    border: 0;
+    color: #848e9c;
+    padding: 9px 15px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.market-tabs button.active {
+    color: #f0b90b;
+    border-bottom: 2px solid #f0b90b;
+}
+
+.search {
+    margin-left: auto;
+}
+
+.search input {
+    width: 190px;
+    background: #2b2f36;
+    border: 1px solid #3b4048;
+    color: white;
+    padding: 9px 12px;
+    border-radius: 6px;
+    outline: none;
+}
+
+.main {
+    display: grid;
+    grid-template-columns: 220px minmax(500px, 1fr) 280px;
+    height: calc(100vh - 58px);
+}
+
+.sidebar {
+    background: #161a1e;
+    border-right: 1px solid #2b2f36;
+    overflow-y: auto;
+}
+
+.sidebar-title {
+    padding: 16px;
+    font-size: 13px;
+    color: #848e9c;
+    border-bottom: 1px solid #2b2f36;
+}
+
+.coin {
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    border-bottom: 1px solid #20242a;
+}
+
+.coin:hover,
+.coin.active {
+    background: #1e2329;
+}
+
+.coin-name {
+    font-weight: bold;
+}
+
+.coin-price {
+    color: #d1d4dc;
+}
+
+.chart-area {
+    min-width: 0;
+    background: #0b0e11;
+}
+
+.chart-header {
+    height: 112px;
+    padding: 12px 18px;
+    border-bottom: 1px solid #2b2f36;
+}
+
+.pair {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.live-price {
+    color: #0ecb81;
+    font-size: 22px;
+    margin-left: 15px;
+}
+
+.stats {
+    display: flex;
+    gap: 25px;
+    margin-top: 9px;
+    color: #848e9c;
+    font-size: 12px;
+}
+
+.timeframes {
+    display: flex;
+    gap: 4px;
+    margin-top: 14px;
+}
+
+.timeframes button {
+    border: 0;
+    background: transparent;
+    color: #848e9c;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.timeframes button:hover,
+.timeframes button.active {
+    color: #f0b90b;
+    background: #2b2f36;
+    border-radius: 4px;
+}
+
+.chart-wrapper {
+    position: relative;
+    height: calc(100% - 112px);
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.smc-panel {
+    position: absolute;
+    top: 12px;
+    left: 15px;
+    background: rgba(22,26,30,.92);
+    border: 1px solid #30353d;
+    border-radius: 6px;
+    padding: 10px 13px;
+    font-size: 12px;
+    min-width: 180px;
+}
+
+.smc-title {
+    color: #f0b90b;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.smc-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px 0;
+}
+
+.ok {
+    color: #0ecb81;
+}
+
+.wait {
+    color: #f0b90b;
+}
+
+.rightbar {
+    background: #161a1e;
+    border-left: 1px solid #2b2f36;
+    overflow-y: auto;
+}
+
+.right-title {
+    padding: 16px;
+    font-weight: bold;
+    border-bottom: 1px solid #2b2f36;
+}
+
+.orderbook {
+    padding: 12px;
+}
+
+.book-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    font-size: 11px;
+    padding: 3px 0;
+    color: #b7bdc6;
+}
+
+.book-header {
+    color: #5e6673;
+    margin-bottom: 7px;
+}
+
+.ask {
+    color: #f6465d;
+}
+
+.bid {
+    color: #0ecb81;
+}
+
+.signal {
+    margin: 15px 12px;
+    padding: 14px;
+    background: #1e2329;
+    border: 1px solid #30353d;
+    border-radius: 7px;
+}
+
+.signal-title {
+    color: #f0b90b;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.signal-status {
+    font-size: 18px;
+    font-weight: bold;
+    color: #0ecb81;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 220px;
+    right: 280px;
+    background: rgba(24,26,32,.95);
+    border-top: 1px solid #2b2f36;
+    padding: 7px 15px;
+    font-size: 11px;
+    color: #848e9c;
+}
+
+@media(max-width: 900px) {
+    .main {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar,
+    .rightbar {
+        display: none;
+    }
+
+    .footer {
+        left: 0;
+        right: 0;
+    }
+
+    .search {
+        display: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+
+    <div class="logo">SMC AI SCANNER</div>
+
+    <div class="market-tabs">
+        <button class="active" onclick="setMarket('SPOT', this)">Spot</button>
+        <button onclick="setMarket('FUTURES', this)">Futures</button>
+    </div>
+
+    <div class="search">
+        <input id="search" placeholder="Search symbol..." onkeyup="searchCoins()">
+    </div>
+
+</header>
+
+<div class="main">
+
+    <!-- LEFT WATCHLIST -->
+    <aside class="sidebar">
+
+        <div class="sidebar-title">
+            MARKETS
+        </div>
+
+        <div id="coinList">
+
+            <div class="coin active" data-symbol="BTCUSDT" onclick="selectCoin('BTCUSDT')">
+                <span class="coin-name">BTC/USDT</span>
+                <span class="coin-price" id="price-BTCUSDT">--</span>
+            </div>
+
+            <div class="coin" data-symbol="ETHUSDT" onclick="selectCoin('ETHUSDT')">
+                <span class="coin-name">ETH/USDT</span>
+                <span class="coin-price" id="price-ETHUSDT">--</span>
+            </div>
+
+            <div class="coin" data-symbol="SOLUSDT" onclick="selectCoin('SOLUSDT')">
+                <span class="coin-name">SOL/USDT</span>
+                <span class="coin-price" id="price-SOLUSDT">--</span>
+            </div>
+
+            <div class="coin" data-symbol="AVAXUSDT" onclick="selectCoin('AVAXUSDT')">
+                <span class="coin-name">AVAX/USDT</span>
+                <span class="coin-price" id="price-AVAXUSDT">--</span>
+            </div>
+
+            <div class="coin" data-symbol="SEIUSDT" onclick="selectCoin('SEIUSDT')">
+                <span class="coin-name">SEI/USDT</span>
+                <span class="coin-price" id="price-SEIUSDT">--</span>
+            </div>
+
+            <div class="coin" data-symbol="TIAUSDT" onclick="selectCoin('TIAUSDT')">
+                <span class="coin-name">TIA/USDT</span>
+                <span class="coin-price" id="price-TIAUSDT">--</span>
+            </div>
+
+            <div class="coin" data-symbol="API3USDT" onclick="selectCoin('API3USDT')">
+                <span class="coin-name">API3/USDT</span>
+                <span class="coin-price" id="price-API3USDT">--</span>
+            </div>
+
+        </div>
+
+    </aside>
+
+    <!-- CHART -->
+    <section class="chart-area">
+
+        <div class="chart-header">
+
+            <div>
+                <span class="pair" id="pair">BTC/USDT</span>
+                <span class="live-price" id="livePrice">--</span>
+            </div>
+
+            <div class="stats">
+                <span>24h Change <b id="change">--</b></span>
+                <span>24h High <b id="high">--</b></span>
+                <span>24h Low <b id="low">--</b></span>
+            </div>
+
+            <div class="timeframes">
+                <button onclick="changeTF('1m', this)">1m</button>
+                <button onclick="changeTF('5m', this)">5m</button>
+                <button class="active" onclick="changeTF('15m', this)">15m</button>
+                <button onclick="changeTF('1h', this)">1H</button>
+                <button onclick="changeTF('4h', this)">4H</button>
+                <button onclick="changeTF('1d', this)">1D</button>
+                <button onclick="changeTF('1w', this)">1W</button>
+            </div>
+
+        </div>
+
+        <div class="chart-wrapper">
+
+            <canvas id="chart"></canvas>
+
+            <div class="smc-panel">
+
+                <div class="smc-title">
+                    SMC AI ANALYSIS
+                </div>
+
+                <div class="smc-row">
+                    <span>Liquidity Sweep</span>
+                    <span class="wait" id="sweep">WAIT</span>
+                </div>
+
+                <div class="smc-row">
+                    <span>CHoCH / MSS</span>
+                    <span class="wait" id="choch">WAIT</span>
+                </div>
+
+                <div class="smc-row">
+                    <span>BOS</span>
+                    <span class="wait" id="bos">WAIT</span>
+                </div>
+
+                <div class="smc-row">
+                    <span>FVG / OB</span>
+                    <span class="wait" id="fvg">WAIT</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- RIGHT SIDE -->
+    <aside class="rightbar">
+
+        <div class="right-title">
+            ORDER BOOK
+        </div>
+
+        <div class="orderbook">
+
+            <div class="book-row book-header">
+                <span>Price</span>
+                <span>Amount</span>
+                <span>Total</span>
+            </div>
+
+            <div id="asks"></div>
+
+            <div style="height:12px"></div>
+
+            <div id="bids"></div>
+
+        </div>
+
+        <div class="signal">
+
+            <div class="signal-title">
+                SMC AI SIGNAL
+            </div>
+
+            <div class="signal-status" id="signal">
+                SCANNING...
+            </div>
+
+            <p id="signalText">
+                Waiting for SMC confirmation.
+            </p>
+
+        </div>
+
+    </aside>
+
+</div>
+
+<div class="footer">
+    SMC AI Scanner • Live market data • Analysis tool only
+</div>
+
+
+<script>
+
+let currentSymbol = "BTCUSDT";
+let currentTF = "15m";
+let socket = null;
+let candles = [];
+
+const canvas = document.getElementById("chart");
+const ctx = canvas.getContext("2d");
+
+
+function resizeCanvas() {
+
+    const rect = canvas.getBoundingClientRect();
+
+    canvas.width = rect.width * devicePixelRatio;
+    canvas.height = rect.height * devicePixelRatio;
+
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+
+    drawChart();
+}
+
+window.addEventListener("resize", resizeCanvas);
+
+
+function connectMarket() {
+
+    if(socket) {
+        socket.close();
+    }
+
+    candles = [];
+
+    const url =
+        "wss://stream.binance.com:9443/ws/"
+        + currentSymbol.toLowerCase()
+        + "@kline_"
+        + currentTF;
+
+    socket = new WebSocket(url);
+
+    socket.onmessage = function(event) {
+
+        const data = JSON.parse(event.data);
+
+        if(!data.k) return;
+
+        const k = data.k;
+
+        const candle = {
+            open: Number(k.o),
+            high: Number(k.h),
+            low: Number(k.l),
+            close: Number(k.c),
+            volume: Number(k.v),
+            time: k.t
+        };
+
+        if(candles.length === 0) {
+
+            candles.push(candle);
+
+        } else {
+
+            const last = candles[candles.length - 1];
+
+            if(last.time === candle.time) {
+
+                candles[candles.length - 1] = candle;
+
+            } else {
+
+                candles.push(candle);
+
+            }
+        }
+
+        if(candles.length > 100) {
+            candles.shift();
+        }
+
+        updatePrice(candle.close);
+
+        detectSMC();
+
+        drawChart();
+    };
+
+    socket.onerror = function() {
+        console.log("Market connection error");
+    };
+}
+
+
+function updatePrice(price) {
+
+    document.getElementById("livePrice").innerText =
+        formatPrice(price);
+
+    const el =
+        document.getElementById("price-" + currentSymbol);
+
+    if(el) {
+        el.innerText = formatPrice(price);
+    }
+}
+
+
+function formatPrice(price) {
+
+    if(price >= 1000)
+        return Number(price).toLocaleString(
+            undefined,
+            {maximumFractionDigits:2}
+        );
+
+    if(price >= 1)
+        return Number(price).toFixed(4);
+
+    return Number(price).toFixed(6);
+}
+
+
+function drawChart() {
+
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+
+    if(width <= 0 || height <= 0) return;
+
+    ctx.clearRect(0,0,width,height);
+
+    ctx.fillStyle = "#0b0e11";
+    ctx.fillRect(0,0,width,height);
+
+    if(candles.length < 2) {
+
+        ctx.fillStyle = "#848e9c";
+        ctx.font = "14px Arial";
+        ctx.fillText(
+            "Connecting to live market data...",
+            30,
+            40
+        );
+
+        return;
+    }
+
+    const visible = candles.slice(-70);
+
+    let min = Math.min(...visible.map(c => c.low));
+    let max = Math.max(...visible.map(c => c.high));
+
+    const padding = (max-min) * .08;
+
+    min -= padding;
+    max += padding;
+
+    const chartHeight = height - 45;
+
+    function y(price) {
+
+        return chartHeight -
+            ((price-min)/(max-min))*chartHeight;
+    }
+
+    const candleWidth =
+        Math.max(4, width / visible.length * .65);
+
+    const gap =
+        width / visible.length;
+
+    /* GRID */
+
+    ctx.strokeStyle = "#1c2026";
+    ctx.lineWidth = 1;
+
+    for(let i=0;i<6;i++) {
+
+        const gy =
+            (chartHeight/5)*i;
+
+        ctx.beginPath();
+        ctx.moveTo(0,gy);
+        ctx.lineTo(width,gy);
+        ctx.stroke();
+    }
+
+    /* CANDLES */
+
+    visible.forEach((c,i) => {
+
+        const x =
+            i*gap + gap/2;
+
+        const openY = y(c.open);
+        const closeY = y(c.close);
+        const highY = y(c.high);
+        const lowY = y(c.low);
+
+        const bullish =
+            c.close >= c.open;
+
+        ctx.strokeStyle =
+            bullish ? "#0ecb81" : "#f6465d";
+
+        ctx.fillStyle =
+            bullish ? "#0ecb81" : "#f6465d";
+
+        /* wick */
+
+        ctx.beginPath();
+        ctx.moveTo(x,highY);
+        ctx.lineTo(x,lowY);
+        ctx.stroke();
+
+        /* body */
+
+        const bodyTop =
+            Math.min(openY,closeY);
+
+        const bodyHeight =
+            Math.max(1,Math.abs(closeY-openY));
+
+        ctx.fillRect(
+            x-candleWidth/2,
+            bodyTop,
+            candleWidth,
+            bodyHeight
+        );
+
+    });
+
+    /* PRICE SCALE */
+
+    ctx.fillStyle = "#848e9c";
+    ctx.font = "10px Arial";
+
+    for(let i=0;i<6;i++) {
+
+        const price =
+            max - ((max-min)/5)*i;
+
+        const py =
+            (chartHeight/5)*i + 12;
+
+        ctx.fillText(
+            formatPrice(price),
+            width-75,
+            py
+        );
+    }
+
+}
+
+
+function selectCoin(symbol) {
+
+    currentSymbol = symbol;
+
+    document.querySelectorAll(".coin")
+        .forEach(c => c.classList.remove("active"));
+
+    const selected =
+        document.querySelector(
+            '[data-symbol="' + symbol + '"]'
+        );
+
+    if(selected)
+        selected.classList.add("active");
+
+    document.getElementById("pair").innerText =
+        symbol.replace("USDT","/USDT");
+
+    connectMarket();
+}
+
+
+function changeTF(tf, button) {
+
+    currentTF = tf;
+
+    document.querySelectorAll(".timeframes button")
+        .forEach(b => b.classList.remove("active"));
+
+    button.classList.add("active");
+
+    connectMarket();
+}
+
+
+function setMarket(type, button) {
+
+    document.querySelectorAll(".market-tabs button")
+        .forEach(b => b.classList.remove("active"));
+
+    button.classList.add("active");
+
+    if(type === "FUTURES") {
+
+        alert(
+            "Futures terminal selected. Futures data engine will be connected in the next build."
+        );
+
+    }
+
+}
+
+
+function searchCoins() {
+
+    const search =
+        document.getElementById("search")
+        .value.toUpperCase();
+
+    document.querySelectorAll(".coin")
+        .forEach(c => {
+
+            c.style.display =
+                c.innerText.includes(search)
+                ? "flex"
+                : "none";
+
+        });
+}
+
+
+/* BASIC SMC ENGINE PLACEHOLDER */
+
+function detectSMC() {
+
+    if(candles.length < 10) return;
+
+    const recent =
+        candles.slice(-10);
+
+    const highs =
+        recent.map(c => c.high);
+
+    const lows =
+        recent.map(c => c.low);
+
+    const current =
+        recent[recent.length-1];
+
+    const previousHigh =
+        Math.max(...highs.slice(0,-1));
+
+    const previousLow =
+        Math.min(...lows.slice(0,-1));
+
+    let bullish = false;
+    let bearish = false;
+
+    if(current.close > previousHigh) {
+        bullish = true;
+    }
+
+    if(current.close < previousLow) {
+        bearish = true;
+    }
+
+    if(bullish) {
+
+        document.getElementById("bos")
+            .innerText = "BULLISH";
+
+        document.getElementById("bos")
+            .className = "ok";
+
+        document.getElementById("signal")
+            .innerText = "🟢 BULLISH";
+
+        document.getElementById("signalText")
+            .innerText =
+            "Potential bullish structure break detected.";
+
+    } else if(bearish) {
+
+        document.getElementById("bos")
+            .innerText = "BEARISH";
+
+        document.getElementById("bos")
+            .className = "ask";
+
+        document.getElementById("signal")
+            .innerText = "🔴 BEARISH";
+
+        document.getElementById("signalText")
+            .innerText =
+            "Potential bearish structure break detected.";
+
+    }
+
+}
+
+
+/* DEMO ORDER BOOK */
+
+function updateOrderBook(price) {
+
+    let asks = "";
+    let bids = "";
+
+    for(let i=1;i<=7;i++) {
+
+        const ask =
+            price + i * price * 0.0001;
+
+        const bid =
+            price - i * price * 0.0001;
+
+        asks += `
+            <div class="book-row">
+                <span class="ask">${formatPrice(ask)}</span>
+                <span>${(Math.random()*2).toFixed(4)}</span>
+                <span>${(Math.random()*50000).toFixed(2)}</span>
+            </div>
+        `;
+
+        bids += `
+            <div class="book-row">
+                <span class="bid">${formatPrice(bid)}</span>
+                <span>${(Math.random()*2).toFixed(4)}</span>
+                <span>${(Math.random()*50000).toFixed(2)}</span>
+            </div>
+        `;
+    }
+
+    document.getElementById("asks").innerHTML = asks;
+    document.getElementById("bids").innerHTML = bids;
+}
+
+
+/* START */
+
+resizeCanvas();
+
+connectMarket();
+
+setInterval(() => {
+
+    const priceText =
+        document.getElementById("livePrice").innerText;
+
+    const price =
+        parseFloat(priceText.replace(/,/g,""));
+
+    if(price) {
+        updateOrderBook(price);
+    }
+
+}, 1000);
+
+</script>
+
+</body>
+</html>
