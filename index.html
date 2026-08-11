@@ -6,292 +6,279 @@
 <title>SMC AI Scanner</title>
 
 <style>
-* {
-    box-sizing: border-box;
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    background:#0b0e11;
+    color:#eaecef;
+    font-family:Arial,Helvetica,sans-serif;
+    overflow:hidden
 }
 
-body {
-    margin: 0;
-    background: #0b0e11;
-    color: #eaecef;
-    font-family: Arial, Helvetica, sans-serif;
-    overflow-x: hidden;
+button{font-family:inherit}
+
+.header{
+    height:58px;
+    background:#181a20;
+    border-bottom:1px solid #2b2f36;
+    display:flex;
+    align-items:center;
+    padding:0 18px;
+    gap:24px
 }
 
-button {
-    font-family: inherit;
+.logo{
+    font-size:20px;
+    font-weight:bold;
+    color:#f0b90b;
+    white-space:nowrap
 }
 
-.header {
-    height: 58px;
-    background: #181a20;
-    border-bottom: 1px solid #2b2f36;
-    display: flex;
-    align-items: center;
-    padding: 0 18px;
-    gap: 24px;
+.market-tabs{
+    display:flex;
+    gap:8px
 }
 
-.logo {
-    font-size: 20px;
-    font-weight: bold;
-    color: #f0b90b;
-    white-space: nowrap;
+.market-tabs button{
+    background:transparent;
+    border:0;
+    color:#848e9c;
+    padding:9px 15px;
+    cursor:pointer;
+    font-weight:bold
 }
 
-.market-tabs {
-    display: flex;
-    gap: 8px;
+.market-tabs button.active{
+    color:#f0b90b;
+    border-bottom:2px solid #f0b90b
 }
 
-.market-tabs button {
-    background: transparent;
-    border: 0;
-    color: #848e9c;
-    padding: 9px 15px;
-    cursor: pointer;
-    font-weight: bold;
+.search{
+    margin-left:auto
 }
 
-.market-tabs button.active {
-    color: #f0b90b;
-    border-bottom: 2px solid #f0b90b;
+.search input{
+    width:190px;
+    background:#2b2f36;
+    border:1px solid #3b4048;
+    color:white;
+    padding:9px 12px;
+    border-radius:6px;
+    outline:none
 }
 
-.search {
-    margin-left: auto;
+.main{
+    display:grid;
+    grid-template-columns:220px minmax(500px,1fr) 280px;
+    height:calc(100vh - 58px)
 }
 
-.search input {
-    width: 190px;
-    background: #2b2f36;
-    border: 1px solid #3b4048;
-    color: white;
-    padding: 9px 12px;
-    border-radius: 6px;
-    outline: none;
+.sidebar{
+    background:#161a1e;
+    border-right:1px solid #2b2f36;
+    overflow-y:auto
 }
 
-.main {
-    display: grid;
-    grid-template-columns: 220px minmax(500px, 1fr) 280px;
-    height: calc(100vh - 58px);
+.sidebar-title{
+    padding:16px;
+    font-size:13px;
+    color:#848e9c;
+    border-bottom:1px solid #2b2f36
 }
 
-.sidebar {
-    background: #161a1e;
-    border-right: 1px solid #2b2f36;
-    overflow-y: auto;
-}
-
-.sidebar-title {
-    padding: 16px;
-    font-size: 13px;
-    color: #848e9c;
-    border-bottom: 1px solid #2b2f36;
-}
-
-.coin {
-    padding: 12px 16px;
-    display: flex;
-    justify-content: space-between;
-    cursor: pointer;
-    border-bottom: 1px solid #20242a;
+.coin{
+    padding:12px 16px;
+    display:flex;
+    justify-content:space-between;
+    cursor:pointer;
+    border-bottom:1px solid #20242a
 }
 
 .coin:hover,
-.coin.active {
-    background: #1e2329;
+.coin.active{
+    background:#1e2329
 }
 
-.coin-name {
-    font-weight: bold;
+.coin-name{
+    font-weight:bold
 }
 
-.coin-price {
-    color: #d1d4dc;
+.coin-price{
+    color:#d1d4dc
 }
 
-.chart-area {
-    min-width: 0;
-    background: #0b0e11;
+.chart-area{
+    min-width:0;
+    background:#0b0e11
 }
 
-.chart-header {
-    height: 112px;
-    padding: 12px 18px;
-    border-bottom: 1px solid #2b2f36;
+.chart-header{
+    height:112px;
+    padding:12px 18px;
+    border-bottom:1px solid #2b2f36
 }
 
-.pair {
-    font-size: 20px;
-    font-weight: bold;
+.pair{
+    font-size:20px;
+    font-weight:bold
 }
 
-.live-price {
-    color: #0ecb81;
-    font-size: 22px;
-    margin-left: 15px;
+.live-price{
+    color:#0ecb81;
+    font-size:22px;
+    margin-left:15px
 }
 
-.stats {
-    display: flex;
-    gap: 25px;
-    margin-top: 9px;
-    color: #848e9c;
-    font-size: 12px;
+.stats{
+    display:flex;
+    gap:25px;
+    margin-top:9px;
+    color:#848e9c;
+    font-size:12px
 }
 
-.timeframes {
-    display: flex;
-    gap: 4px;
-    margin-top: 14px;
+.timeframes{
+    display:flex;
+    gap:4px;
+    margin-top:14px
 }
 
-.timeframes button {
-    border: 0;
-    background: transparent;
-    color: #848e9c;
-    padding: 5px 10px;
-    cursor: pointer;
+.timeframes button{
+    border:0;
+    background:transparent;
+    color:#848e9c;
+    padding:5px 10px;
+    cursor:pointer
 }
 
 .timeframes button:hover,
-.timeframes button.active {
-    color: #f0b90b;
-    background: #2b2f36;
-    border-radius: 4px;
+.timeframes button.active{
+    color:#f0b90b;
+    background:#2b2f36;
+    border-radius:4px
 }
 
-.chart-wrapper {
-    position: relative;
-    height: calc(100% - 112px);
+.chart-wrapper{
+    position:relative;
+    height:calc(100% - 112px)
 }
 
-canvas {
-    width: 100%;
-    height: 100%;
-    display: block;
+#chart{
+    width:100%;
+    height:100%;
+    display:block
 }
 
-.smc-panel {
-    position: absolute;
-    top: 12px;
-    left: 15px;
-    background: rgba(22,26,30,.92);
-    border: 1px solid #30353d;
-    border-radius: 6px;
-    padding: 10px 13px;
-    font-size: 12px;
-    min-width: 180px;
+.smc-panel{
+    position:absolute;
+    top:12px;
+    left:15px;
+    background:rgba(22,26,30,.94);
+    border:1px solid #30353d;
+    border-radius:6px;
+    padding:10px 13px;
+    font-size:12px;
+    min-width:190px
 }
 
-.smc-title {
-    color: #f0b90b;
-    font-weight: bold;
-    margin-bottom: 7px;
+.smc-title{
+    color:#f0b90b;
+    font-weight:bold;
+    margin-bottom:7px
 }
 
-.smc-row {
-    display: flex;
-    justify-content: space-between;
-    margin: 5px 0;
+.smc-row{
+    display:flex;
+    justify-content:space-between;
+    margin:5px 0
 }
 
-.ok {
-    color: #0ecb81;
+.ok{color:#0ecb81}
+.wait{color:#f0b90b}
+.bad{color:#f6465d}
+
+.rightbar{
+    background:#161a1e;
+    border-left:1px solid #2b2f36;
+    overflow-y:auto
 }
 
-.wait {
-    color: #f0b90b;
+.right-title{
+    padding:16px;
+    font-weight:bold;
+    border-bottom:1px solid #2b2f36
 }
 
-.rightbar {
-    background: #161a1e;
-    border-left: 1px solid #2b2f36;
-    overflow-y: auto;
+.orderbook{
+    padding:12px
 }
 
-.right-title {
-    padding: 16px;
-    font-weight: bold;
-    border-bottom: 1px solid #2b2f36;
+.book-row{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    font-size:11px;
+    padding:3px 0;
+    color:#b7bdc6
 }
 
-.orderbook {
-    padding: 12px;
+.book-header{
+    color:#5e6673;
+    margin-bottom:7px
 }
 
-.book-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    font-size: 11px;
-    padding: 3px 0;
-    color: #b7bdc6;
+.ask{color:#f6465d}
+.bid{color:#0ecb81}
+
+.signal{
+    margin:15px 12px;
+    padding:14px;
+    background:#1e2329;
+    border:1px solid #30353d;
+    border-radius:7px
 }
 
-.book-header {
-    color: #5e6673;
-    margin-bottom: 7px;
+.signal-title{
+    color:#f0b90b;
+    font-weight:bold;
+    margin-bottom:10px
 }
 
-.ask {
-    color: #f6465d;
+.signal-status{
+    font-size:18px;
+    font-weight:bold;
+    color:#0ecb81
 }
 
-.bid {
-    color: #0ecb81;
+.footer{
+    position:fixed;
+    bottom:0;
+    left:220px;
+    right:280px;
+    background:rgba(24,26,32,.95);
+    border-top:1px solid #2b2f36;
+    padding:7px 15px;
+    font-size:11px;
+    color:#848e9c
 }
 
-.signal {
-    margin: 15px 12px;
-    padding: 14px;
-    background: #1e2329;
-    border: 1px solid #30353d;
-    border-radius: 7px;
-}
-
-.signal-title {
-    color: #f0b90b;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.signal-status {
-    font-size: 18px;
-    font-weight: bold;
-    color: #0ecb81;
-}
-
-.footer {
-    position: fixed;
-    bottom: 0;
-    left: 220px;
-    right: 280px;
-    background: rgba(24,26,32,.95);
-    border-top: 1px solid #2b2f36;
-    padding: 7px 15px;
-    font-size: 11px;
-    color: #848e9c;
-}
-
-@media(max-width: 900px) {
-    .main {
-        grid-template-columns: 1fr;
+@media(max-width:900px){
+    .main{
+        grid-template-columns:1fr
     }
 
     .sidebar,
-    .rightbar {
-        display: none;
+    .rightbar{
+        display:none
     }
 
-    .footer {
-        left: 0;
-        right: 0;
+    .footer{
+        left:0;
+        right:0
     }
 
-    .search {
-        display: none;
+    .search{
+        display:none
     }
 }
 </style>
@@ -301,635 +288,1120 @@ canvas {
 
 <header class="header">
 
-    <div class="logo">SMC AI SCANNER</div>
+<div class="logo">SMC AI SCANNER</div>
 
-    <div class="market-tabs">
-        <button class="active" onclick="setMarket('SPOT', this)">Spot</button>
-        <button onclick="setMarket('FUTURES', this)">Futures</button>
-    </div>
+<div class="market-tabs">
 
-    <div class="search">
-        <input id="search" placeholder="Search symbol..." onkeyup="searchCoins()">
-    </div>
+<button class="active"
+onclick="setMarket('SPOT',this)">
+Spot
+</button>
+
+<button onclick="setMarket('FUTURES',this)">
+Futures
+</button>
+
+</div>
+
+<div class="search">
+
+<input
+id="search"
+placeholder="Search symbol..."
+onkeyup="searchCoins()">
+
+</div>
 
 </header>
 
 <div class="main">
 
-    <!-- LEFT WATCHLIST -->
-    <aside class="sidebar">
+<aside class="sidebar">
 
-        <div class="sidebar-title">
-            MARKETS
-        </div>
+<div class="sidebar-title">
+MARKETS
+</div>
 
-        <div id="coinList">
+<div id="coinList">
 
-            <div class="coin active" data-symbol="BTCUSDT" onclick="selectCoin('BTCUSDT')">
-                <span class="coin-name">BTC/USDT</span>
-                <span class="coin-price" id="price-BTCUSDT">--</span>
-            </div>
+<div class="coin active"
+data-symbol="BTCUSDT"
+onclick="selectCoin('BTCUSDT')">
 
-            <div class="coin" data-symbol="ETHUSDT" onclick="selectCoin('ETHUSDT')">
-                <span class="coin-name">ETH/USDT</span>
-                <span class="coin-price" id="price-ETHUSDT">--</span>
-            </div>
+<span class="coin-name">
+BTC/USDT
+</span>
 
-            <div class="coin" data-symbol="SOLUSDT" onclick="selectCoin('SOLUSDT')">
-                <span class="coin-name">SOL/USDT</span>
-                <span class="coin-price" id="price-SOLUSDT">--</span>
-            </div>
-
-            <div class="coin" data-symbol="AVAXUSDT" onclick="selectCoin('AVAXUSDT')">
-                <span class="coin-name">AVAX/USDT</span>
-                <span class="coin-price" id="price-AVAXUSDT">--</span>
-            </div>
-
-            <div class="coin" data-symbol="SEIUSDT" onclick="selectCoin('SEIUSDT')">
-                <span class="coin-name">SEI/USDT</span>
-                <span class="coin-price" id="price-SEIUSDT">--</span>
-            </div>
-
-            <div class="coin" data-symbol="TIAUSDT" onclick="selectCoin('TIAUSDT')">
-                <span class="coin-name">TIA/USDT</span>
-                <span class="coin-price" id="price-TIAUSDT">--</span>
-            </div>
-
-            <div class="coin" data-symbol="API3USDT" onclick="selectCoin('API3USDT')">
-                <span class="coin-name">API3/USDT</span>
-                <span class="coin-price" id="price-API3USDT">--</span>
-            </div>
-
-        </div>
-
-    </aside>
-
-    <!-- CHART -->
-    <section class="chart-area">
-
-        <div class="chart-header">
-
-            <div>
-                <span class="pair" id="pair">BTC/USDT</span>
-                <span class="live-price" id="livePrice">--</span>
-            </div>
-
-            <div class="stats">
-                <span>24h Change <b id="change">--</b></span>
-                <span>24h High <b id="high">--</b></span>
-                <span>24h Low <b id="low">--</b></span>
-            </div>
-
-            <div class="timeframes">
-                <button onclick="changeTF('1m', this)">1m</button>
-                <button onclick="changeTF('5m', this)">5m</button>
-                <button class="active" onclick="changeTF('15m', this)">15m</button>
-                <button onclick="changeTF('1h', this)">1H</button>
-                <button onclick="changeTF('4h', this)">4H</button>
-                <button onclick="changeTF('1d', this)">1D</button>
-                <button onclick="changeTF('1w', this)">1W</button>
-            </div>
-
-        </div>
-
-        <div class="chart-wrapper">
-
-            <canvas id="chart"></canvas>
-
-            <div class="smc-panel">
-
-                <div class="smc-title">
-                    SMC AI ANALYSIS
-                </div>
-
-                <div class="smc-row">
-                    <span>Liquidity Sweep</span>
-                    <span class="wait" id="sweep">WAIT</span>
-                </div>
-
-                <div class="smc-row">
-                    <span>CHoCH / MSS</span>
-                    <span class="wait" id="choch">WAIT</span>
-                </div>
-
-                <div class="smc-row">
-                    <span>BOS</span>
-                    <span class="wait" id="bos">WAIT</span>
-                </div>
-
-                <div class="smc-row">
-                    <span>FVG / OB</span>
-                    <span class="wait" id="fvg">WAIT</span>
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-    <!-- RIGHT SIDE -->
-    <aside class="rightbar">
-
-        <div class="right-title">
-            ORDER BOOK
-        </div>
-
-        <div class="orderbook">
-
-            <div class="book-row book-header">
-                <span>Price</span>
-                <span>Amount</span>
-                <span>Total</span>
-            </div>
-
-            <div id="asks"></div>
-
-            <div style="height:12px"></div>
-
-            <div id="bids"></div>
-
-        </div>
-
-        <div class="signal">
-
-            <div class="signal-title">
-                SMC AI SIGNAL
-            </div>
-
-            <div class="signal-status" id="signal">
-                SCANNING...
-            </div>
-
-            <p id="signalText">
-                Waiting for SMC confirmation.
-            </p>
-
-        </div>
-
-    </aside>
+<span class="coin-price"
+id="price-BTCUSDT">
+--
+</span>
 
 </div>
 
+<div class="coin"
+data-symbol="ETHUSDT"
+onclick="selectCoin('ETHUSDT')">
+
+<span class="coin-name">
+ETH/USDT
+</span>
+
+<span class="coin-price"
+id="price-ETHUSDT">
+--
+</span>
+
+</div>
+
+<div class="coin"
+data-symbol="SOLUSDT"
+onclick="selectCoin('SOLUSDT')">
+
+<span class="coin-name">
+SOL/USDT
+</span>
+
+<span class="coin-price"
+id="price-SOLUSDT">
+--
+</span>
+
+</div>
+
+<div class="coin"
+data-symbol="AVAXUSDT"
+onclick="selectCoin('AVAXUSDT')">
+
+<span class="coin-name">
+AVAX/USDT
+</span>
+
+<span class="coin-price"
+id="price-AVAXUSDT">
+--
+</span>
+
+</div>
+
+<div class="coin"
+data-symbol="SEIUSDT"
+onclick="selectCoin('SEIUSDT')">
+
+<span class="coin-name">
+SEI/USDT
+</span>
+
+<span class="coin-price"
+id="price-SEIUSDT">
+--
+</span>
+
+</div>
+
+<div class="coin"
+data-symbol="TIAUSDT"
+onclick="selectCoin('TIAUSDT')">
+
+<span class="coin-name">
+TIA/USDT
+</span>
+
+<span class="coin-price"
+id="price-TIAUSDT">
+--
+</span>
+
+</div>
+
+<div class="coin"
+data-symbol="API3USDT"
+onclick="selectCoin('API3USDT')">
+
+<span class="coin-name">
+API3/USDT
+</span>
+
+<span class="coin-price"
+id="price-API3USDT">
+--
+</span>
+
+</div>
+
+</div>
+
+</aside>
+
+
+<section class="chart-area">
+
+<div class="chart-header">
+
+<div>
+
+<span class="pair" id="pair">
+BTC/USDT
+</span>
+
+<span class="live-price" id="livePrice">
+--
+</span>
+
+</div>
+
+<div class="stats">
+
+<span>
+24h Change
+<b id="change">--</b>
+</span>
+
+<span>
+24h High
+<b id="high">--</b>
+</span>
+
+<span>
+24h Low
+<b id="low">--</b>
+</span>
+
+</div>
+
+<div class="timeframes">
+
+<button onclick="changeTF('1m',this)">
+1m
+</button>
+
+<button onclick="changeTF('5m',this)">
+5m
+</button>
+
+<button class="active"
+onclick="changeTF('15m',this)">
+15m
+</button>
+
+<button onclick="changeTF('1h',this)">
+1H
+</button>
+
+<button onclick="changeTF('4h',this)">
+4H
+</button>
+
+<button onclick="changeTF('1d',this)">
+1D
+</button>
+
+<button onclick="changeTF('1w',this)">
+1W
+</button>
+
+</div>
+
+</div>
+
+
+<div class="chart-wrapper">
+
+<canvas id="chart"></canvas>
+
+<div class="smc-panel">
+
+<div class="smc-title">
+SMC AI ANALYSIS
+</div>
+
+<div class="smc-row">
+<span>Liquidity Sweep</span>
+<span class="wait" id="sweep">
+WAIT
+</span>
+</div>
+
+<div class="smc-row">
+<span>CHoCH / MSS</span>
+<span class="wait" id="choch">
+WAIT
+</span>
+</div>
+
+<div class="smc-row">
+<span>BOS</span>
+<span class="wait" id="bos">
+WAIT
+</span>
+</div>
+
+<div class="smc-row">
+<span>FVG / OB</span>
+<span class="wait" id="fvg">
+WAIT
+</span>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<aside class="rightbar">
+
+<div class="right-title">
+ORDER BOOK
+</div>
+
+<div class="orderbook">
+
+<div class="book-row book-header">
+
+<span>Price</span>
+<span>Amount</span>
+<span>Total</span>
+
+</div>
+
+<div id="asks"></div>
+
+<div style="height:12px"></div>
+
+<div id="bids"></div>
+
+</div>
+
+
+<div class="signal">
+
+<div class="signal-title">
+SMC AI SIGNAL
+</div>
+
+<div class="signal-status" id="signal">
+SCANNING...
+</div>
+
+<p id="signalText">
+Waiting for SMC confirmation.
+</p>
+
+</div>
+
+</aside>
+
+</div>
+
+
 <div class="footer">
-    SMC AI Scanner • Live market data • Analysis tool only
+SMC AI Scanner • Live market data • Analysis tool only
 </div>
 
 
 <script>
 
-let currentSymbol = "BTCUSDT";
-let currentTF = "15m";
-let socket = null;
-let candles = [];
+let currentSymbol="BTCUSDT";
+let currentTF="15m";
+let socket=null;
+let depthSocket=null;
+let candles=[];
 
-const canvas = document.getElementById("chart");
-const ctx = canvas.getContext("2d");
+const canvas=document.getElementById("chart");
+const ctx=canvas.getContext("2d");
 
 
-function resizeCanvas() {
+function resizeCanvas(){
 
-    const rect = canvas.getBoundingClientRect();
+const rect=canvas.getBoundingClientRect();
+const dpr=window.devicePixelRatio||1;
 
-    canvas.width = rect.width * devicePixelRatio;
-    canvas.height = rect.height * devicePixelRatio;
+canvas.width=rect.width*dpr;
+canvas.height=rect.height*dpr;
 
-    ctx.scale(devicePixelRatio, devicePixelRatio);
+ctx.setTransform(dpr,0,0,dpr,0,0);
 
-    drawChart();
+drawChart();
+
 }
 
-window.addEventListener("resize", resizeCanvas);
+window.addEventListener("resize",resizeCanvas);
 
 
-function connectMarket() {
+function formatPrice(p){
 
-    if(socket) {
-        socket.close();
-    }
+if(!Number.isFinite(p))
+return "--";
 
-    candles = [];
+if(p>=1000)
+return p.toLocaleString(
+undefined,
+{maximumFractionDigits:2}
+);
 
-    const url =
-        "wss://stream.binance.com:9443/ws/"
-        + currentSymbol.toLowerCase()
-        + "@kline_"
-        + currentTF;
+if(p>=1)
+return p.toFixed(4);
 
-    socket = new WebSocket(url);
-
-    socket.onmessage = function(event) {
-
-        const data = JSON.parse(event.data);
-
-        if(!data.k) return;
-
-        const k = data.k;
-
-        const candle = {
-            open: Number(k.o),
-            high: Number(k.h),
-            low: Number(k.l),
-            close: Number(k.c),
-            volume: Number(k.v),
-            time: k.t
-        };
-
-        if(candles.length === 0) {
-
-            candles.push(candle);
-
-        } else {
-
-            const last = candles[candles.length - 1];
-
-            if(last.time === candle.time) {
-
-                candles[candles.length - 1] = candle;
-
-            } else {
-
-                candles.push(candle);
-
-            }
-        }
-
-        if(candles.length > 100) {
-            candles.shift();
-        }
-
-        updatePrice(candle.close);
-
-        detectSMC();
-
-        drawChart();
-    };
-
-    socket.onerror = function() {
-        console.log("Market connection error");
-    };
-}
-
-
-function updatePrice(price) {
-
-    document.getElementById("livePrice").innerText =
-        formatPrice(price);
-
-    const el =
-        document.getElementById("price-" + currentSymbol);
-
-    if(el) {
-        el.innerText = formatPrice(price);
-    }
-}
-
-
-function formatPrice(price) {
-
-    if(price >= 1000)
-        return Number(price).toLocaleString(
-            undefined,
-            {maximumFractionDigits:2}
-        );
-
-    if(price >= 1)
-        return Number(price).toFixed(4);
-
-    return Number(price).toFixed(6);
-}
-
-
-function drawChart() {
-
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-
-    if(width <= 0 || height <= 0) return;
-
-    ctx.clearRect(0,0,width,height);
-
-    ctx.fillStyle = "#0b0e11";
-    ctx.fillRect(0,0,width,height);
-
-    if(candles.length < 2) {
-
-        ctx.fillStyle = "#848e9c";
-        ctx.font = "14px Arial";
-        ctx.fillText(
-            "Connecting to live market data...",
-            30,
-            40
-        );
-
-        return;
-    }
-
-    const visible = candles.slice(-70);
-
-    let min = Math.min(...visible.map(c => c.low));
-    let max = Math.max(...visible.map(c => c.high));
-
-    const padding = (max-min) * .08;
-
-    min -= padding;
-    max += padding;
-
-    const chartHeight = height - 45;
-
-    function y(price) {
-
-        return chartHeight -
-            ((price-min)/(max-min))*chartHeight;
-    }
-
-    const candleWidth =
-        Math.max(4, width / visible.length * .65);
-
-    const gap =
-        width / visible.length;
-
-    /* GRID */
-
-    ctx.strokeStyle = "#1c2026";
-    ctx.lineWidth = 1;
-
-    for(let i=0;i<6;i++) {
-
-        const gy =
-            (chartHeight/5)*i;
-
-        ctx.beginPath();
-        ctx.moveTo(0,gy);
-        ctx.lineTo(width,gy);
-        ctx.stroke();
-    }
-
-    /* CANDLES */
-
-    visible.forEach((c,i) => {
-
-        const x =
-            i*gap + gap/2;
-
-        const openY = y(c.open);
-        const closeY = y(c.close);
-        const highY = y(c.high);
-        const lowY = y(c.low);
-
-        const bullish =
-            c.close >= c.open;
-
-        ctx.strokeStyle =
-            bullish ? "#0ecb81" : "#f6465d";
-
-        ctx.fillStyle =
-            bullish ? "#0ecb81" : "#f6465d";
-
-        /* wick */
-
-        ctx.beginPath();
-        ctx.moveTo(x,highY);
-        ctx.lineTo(x,lowY);
-        ctx.stroke();
-
-        /* body */
-
-        const bodyTop =
-            Math.min(openY,closeY);
-
-        const bodyHeight =
-            Math.max(1,Math.abs(closeY-openY));
-
-        ctx.fillRect(
-            x-candleWidth/2,
-            bodyTop,
-            candleWidth,
-            bodyHeight
-        );
-
-    });
-
-    /* PRICE SCALE */
-
-    ctx.fillStyle = "#848e9c";
-    ctx.font = "10px Arial";
-
-    for(let i=0;i<6;i++) {
-
-        const price =
-            max - ((max-min)/5)*i;
-
-        const py =
-            (chartHeight/5)*i + 12;
-
-        ctx.fillText(
-            formatPrice(price),
-            width-75,
-            py
-        );
-    }
+return p.toFixed(6);
 
 }
 
 
-function selectCoin(symbol) {
+function updatePrice(price){
 
-    currentSymbol = symbol;
+document.getElementById("livePrice")
+.innerText=formatPrice(price);
 
-    document.querySelectorAll(".coin")
-        .forEach(c => c.classList.remove("active"));
+const el=
+document.getElementById(
+"price-"+currentSymbol
+);
 
-    const selected =
-        document.querySelector(
-            '[data-symbol="' + symbol + '"]'
-        );
-
-    if(selected)
-        selected.classList.add("active");
-
-    document.getElementById("pair").innerText =
-        symbol.replace("USDT","/USDT");
-
-    connectMarket();
-}
-
-
-function changeTF(tf, button) {
-
-    currentTF = tf;
-
-    document.querySelectorAll(".timeframes button")
-        .forEach(b => b.classList.remove("active"));
-
-    button.classList.add("active");
-
-    connectMarket();
-}
-
-
-function setMarket(type, button) {
-
-    document.querySelectorAll(".market-tabs button")
-        .forEach(b => b.classList.remove("active"));
-
-    button.classList.add("active");
-
-    if(type === "FUTURES") {
-
-        alert(
-            "Futures terminal selected. Futures data engine will be connected in the next build."
-        );
-
-    }
+if(el)
+el.innerText=formatPrice(price);
 
 }
 
 
-function searchCoins() {
+async function loadHistory(){
 
-    const search =
-        document.getElementById("search")
-        .value.toUpperCase();
+try{
 
-    document.querySelectorAll(".coin")
-        .forEach(c => {
+const url=
+`https://api.binance.com/api/v3/klines?symbol=${currentSymbol}&interval=${currentTF}&limit=150`;
 
-            c.style.display =
-                c.innerText.includes(search)
-                ? "flex"
-                : "none";
+const res=await fetch(url);
 
-        });
+if(!res.ok)
+throw new Error("Kline request failed");
+
+const data=await res.json();
+
+candles=data.map(k=>({
+
+time:k[0],
+open:+k[1],
+high:+k[2],
+low:+k[3],
+close:+k[4],
+volume:+k[5]
+
+}));
+
+if(candles.length){
+
+updatePrice(
+candles[candles.length-1].close
+);
+
+detectSMC();
+
+drawChart();
+
 }
 
+}catch(e){
 
-/* BASIC SMC ENGINE PLACEHOLDER */
+console.error(e);
 
-function detectSMC() {
+drawMessage(
+"Unable to load chart data"
+);
 
-    if(candles.length < 10) return;
-
-    const recent =
-        candles.slice(-10);
-
-    const highs =
-        recent.map(c => c.high);
-
-    const lows =
-        recent.map(c => c.low);
-
-    const current =
-        recent[recent.length-1];
-
-    const previousHigh =
-        Math.max(...highs.slice(0,-1));
-
-    const previousLow =
-        Math.min(...lows.slice(0,-1));
-
-    let bullish = false;
-    let bearish = false;
-
-    if(current.close > previousHigh) {
-        bullish = true;
-    }
-
-    if(current.close < previousLow) {
-        bearish = true;
-    }
-
-    if(bullish) {
-
-        document.getElementById("bos")
-            .innerText = "BULLISH";
-
-        document.getElementById("bos")
-            .className = "ok";
-
-        document.getElementById("signal")
-            .innerText = "🟢 BULLISH";
-
-        document.getElementById("signalText")
-            .innerText =
-            "Potential bullish structure break detected.";
-
-    } else if(bearish) {
-
-        document.getElementById("bos")
-            .innerText = "BEARISH";
-
-        document.getElementById("bos")
-            .className = "ask";
-
-        document.getElementById("signal")
-            .innerText = "🔴 BEARISH";
-
-        document.getElementById("signalText")
-            .innerText =
-            "Potential bearish structure break detected.";
-
-    }
+}
 
 }
 
 
-/* DEMO ORDER BOOK */
+async function loadStats(){
 
-function updateOrderBook(price) {
+try{
 
-    let asks = "";
-    let bids = "";
+const r=
+await fetch(
+`https://api.binance.com/api/v3/ticker/24hr?symbol=${currentSymbol}`
+);
 
-    for(let i=1;i<=7;i++) {
+const d=await r.json();
 
-        const ask =
-            price + i * price * 0.0001;
+document.getElementById("change")
+.innerText=
+(+d.priceChangePercent).toFixed(2)+"%";
 
-        const bid =
-            price - i * price * 0.0001;
+document.getElementById("change")
+.style.color=
++d.priceChangePercent>=0
+?"#0ecb81"
+:"#f6465d";
 
-        asks += `
-            <div class="book-row">
-                <span class="ask">${formatPrice(ask)}</span>
-                <span>${(Math.random()*2).toFixed(4)}</span>
-                <span>${(Math.random()*50000).toFixed(2)}</span>
-            </div>
-        `;
+document.getElementById("high")
+.innerText=
+formatPrice(+d.highPrice);
 
-        bids += `
-            <div class="book-row">
-                <span class="bid">${formatPrice(bid)}</span>
-                <span>${(Math.random()*2).toFixed(4)}</span>
-                <span>${(Math.random()*50000).toFixed(2)}</span>
-            </div>
-        `;
-    }
+document.getElementById("low")
+.innerText=
+formatPrice(+d.lowPrice);
 
-    document.getElementById("asks").innerHTML = asks;
-    document.getElementById("bids").innerHTML = bids;
+}catch(e){
+
+console.error(e);
+
+}
+
 }
 
 
-/* START */
+function connectMarket(){
 
-resizeCanvas();
+if(socket)
+socket.close();
+
+if(depthSocket)
+depthSocket.close();
+
+
+socket=
+new WebSocket(
+`wss://stream.binance.com:9443/ws/${currentSymbol.toLowerCase()}@kline_${currentTF}`
+);
+
+
+socket.onmessage=e=>{
+
+const d=JSON.parse(e.data);
+
+if(!d.k)
+return;
+
+const k=d.k;
+
+const c={
+
+open:+k.o,
+high:+k.h,
+low:+k.l,
+close:+k.c,
+volume:+k.v,
+time:k.t
+
+};
+
+const last=
+candles[candles.length-1];
+
+if(last&&last.time===c.time)
+
+candles[candles.length-1]=c;
+
+else
+
+candles.push(c);
+
+
+if(candles.length>150)
+candles.shift();
+
+
+updatePrice(c.close);
+
+detectSMC();
+
+drawChart();
+
+};
+
+
+socket.onerror=()=>
+console.log("Market websocket error");
+
+
+depthSocket=
+new WebSocket(
+`wss://stream.binance.com:9443/ws/${currentSymbol.toLowerCase()}@depth10@100ms`
+);
+
+depthSocket.onmessage=e=>
+renderOrderBook(
+JSON.parse(e.data)
+);
+
+loadStats();
+
+}
+
+
+function renderOrderBook(d){
+
+const asks=
+(d.asks||[]).slice(0,7);
+
+const bids=
+(d.bids||[]).slice(0,7);
+
+
+const make=(arr,cls)=>
+
+arr.map(x=>`
+
+<div class="book-row">
+
+<span class="${cls}">
+${formatPrice(+x[0])}
+</span>
+
+<span>
+${(+x[1]).toFixed(4)}
+</span>
+
+<span>
+${(+x[0]*+x[1]).toFixed(2)}
+</span>
+
+</div>
+
+`).join("");
+
+
+document.getElementById("asks")
+.innerHTML=
+make(asks,"ask");
+
+document.getElementById("bids")
+.innerHTML=
+make(bids,"bid");
+
+}
+
+
+function drawMessage(msg){
+
+const w=canvas.clientWidth;
+const h=canvas.clientHeight;
+
+ctx.clearRect(0,0,w,h);
+
+ctx.fillStyle="#0b0e11";
+
+ctx.fillRect(0,0,w,h);
+
+ctx.fillStyle="#848e9c";
+
+ctx.font="14px Arial";
+
+ctx.fillText(
+msg,
+30,
+40
+);
+
+}
+
+
+function drawChart(){
+
+const width=canvas.clientWidth;
+const height=canvas.clientHeight;
+
+if(width<=0||height<=0)
+return;
+
+
+ctx.clearRect(0,0,width,height);
+
+ctx.fillStyle="#0b0e11";
+
+ctx.fillRect(
+0,
+0,
+width,
+height
+);
+
+
+if(candles.length<2){
+
+drawMessage(
+"Loading live chart..."
+);
+
+return;
+
+}
+
+
+const visible=
+candles.slice(-90);
+
+
+let min=
+Math.min(
+...visible.map(c=>c.low)
+);
+
+let max=
+Math.max(
+...visible.map(c=>c.high)
+);
+
+
+const pad=
+(max-min)*.08||1;
+
+min-=pad;
+max+=pad;
+
+
+const chartHeight=
+height-45;
+
+
+const y=
+p=>
+chartHeight-
+((p-min)/(max-min))*chartHeight;
+
+
+const gap=
+width/visible.length;
+
+const cw=
+Math.max(
+3,
+gap*.62
+);
+
+
+ctx.strokeStyle="#1c2026";
+ctx.lineWidth=1;
+
+
+for(let i=0;i<7;i++){
+
+let gy=
+chartHeight/6*i;
+
+ctx.beginPath();
+
+ctx.moveTo(
+0,
+gy
+);
+
+ctx.lineTo(
+width,
+gy
+);
+
+ctx.stroke();
+
+}
+
+
+visible.forEach((c,i)=>{
+
+const x=
+i*gap+gap/2;
+
+const openY=
+y(c.open);
+
+const closeY=
+y(c.close);
+
+const bullish=
+c.close>=c.open;
+
+
+ctx.strokeStyle=
+bullish
+?"#0ecb81"
+:"#f6465d";
+
+ctx.fillStyle=
+ctx.strokeStyle;
+
+
+ctx.beginPath();
+
+ctx.moveTo(
+x,
+y(c.high)
+);
+
+ctx.lineTo(
+x,
+y(c.low)
+);
+
+ctx.stroke();
+
+
+ctx.fillRect(
+
+x-cw/2,
+
+Math.min(
+openY,
+closeY
+),
+
+cw,
+
+Math.max(
+1,
+Math.abs(
+closeY-openY
+)
+)
+
+);
+
+});
+
+
+ctx.fillStyle="#848e9c";
+ctx.font="10px Arial";
+
+
+for(let i=0;i<7;i++){
+
+const price=
+max-
+(max-min)/6*i;
+
+const py=
+chartHeight/6*i+12;
+
+
+ctx.fillText(
+
+formatPrice(price),
+
+Math.max(
+0,
+width-78
+),
+
+py
+
+);
+
+}
+
+}
+
+
+function setStatus(
+id,
+text,
+cls
+){
+
+const e=
+document.getElementById(id);
+
+e.innerText=text;
+
+e.className=cls;
+
+}
+
+
+function detectSMC(){
+
+if(candles.length<20)
+return;
+
+
+const c=
+candles[candles.length-1];
+
+const prev=
+candles.slice(-11,-1);
+
+
+const ph=
+Math.max(
+...prev.map(x=>x.high)
+);
+
+const pl=
+Math.min(
+...prev.map(x=>x.low)
+);
+
+
+const recent5=
+candles.slice(-6,-1);
+
+
+const rh=
+Math.max(
+...recent5.map(x=>x.high)
+);
+
+const rl=
+Math.min(
+...recent5.map(x=>x.low)
+);
+
+
+setStatus(
+"sweep",
+"WAIT",
+"wait"
+);
+
+setStatus(
+"choch",
+"WAIT",
+"wait"
+);
+
+setStatus(
+"bos",
+"WAIT",
+"wait"
+);
+
+setStatus(
+"fvg",
+"WAIT",
+"wait"
+);
+
+
+if(c.low<rl&&c.close>rl)
+
+setStatus(
+"sweep",
+"BULLISH",
+"ok"
+);
+
+else if(
+c.high>rh&&
+c.close<rh
+)
+
+setStatus(
+"sweep",
+"BEARISH",
+"bad"
+);
+
+
+if(c.close>ph){
+
+setStatus(
+"choch",
+"BULLISH",
+"ok"
+);
+
+setStatus(
+"bos",
+"BULLISH",
+"ok"
+);
+
+document.getElementById("signal")
+.innerText="🟢 BULLISH";
+
+document.getElementById("signalText")
+.innerText=
+"Potential bullish structure break detected.";
+
+}
+
+else if(c.close<pl){
+
+setStatus(
+"choch",
+"BEARISH",
+"bad"
+);
+
+setStatus(
+"bos",
+"BEARISH",
+"bad"
+);
+
+document.getElementById("signal")
+.innerText="🔴 BEARISH";
+
+document.getElementById("signalText")
+.innerText=
+"Potential bearish structure break detected.";
+
+}
+
+else{
+
+document.getElementById("signal")
+.innerText=
+"SCANNING...";
+
+document.getElementById("signalText")
+.innerText=
+"Waiting for SMC confirmation.";
+
+}
+
+
+const a=
+candles[candles.length-3];
+
+const b=
+candles[candles.length-2];
+
+
+if(a&&b&&c.low>b.high)
+
+setStatus(
+"fvg",
+"BULLISH",
+"ok"
+);
+
+
+if(a&&b&&c.high<b.low)
+
+setStatus(
+"fvg",
+"BEARISH",
+"bad"
+);
+
+}
+
+
+function selectCoin(symbol){
+
+currentSymbol=symbol;
+
+
+document
+.querySelectorAll(".coin")
+.forEach(c=>
+c.classList.remove("active")
+);
+
+
+const selected=
+document.querySelector(
+`[data-symbol="${symbol}"]`
+);
+
+
+if(selected)
+selected.classList.add("active");
+
+
+document.getElementById("pair")
+.innerText=
+symbol.replace(
+"USDT",
+"/USDT"
+);
+
+
+candles=[];
+
+drawMessage(
+"Loading live chart..."
+);
+
+loadHistory();
 
 connectMarket();
 
-setInterval(() => {
+}
 
-    const priceText =
-        document.getElementById("livePrice").innerText;
 
-    const price =
-        parseFloat(priceText.replace(/,/g,""));
+function changeTF(tf,button){
 
-    if(price) {
-        updateOrderBook(price);
-    }
+currentTF=tf;
 
-}, 1000);
+
+document
+.querySelectorAll(".timeframes button")
+.forEach(b=>
+b.classList.remove("active")
+);
+
+
+button.classList.add("active");
+
+candles=[];
+
+drawMessage(
+"Loading live chart..."
+);
+
+loadHistory();
+
+connectMarket();
+
+}
+
+
+function setMarket(type,button){
+
+document
+.querySelectorAll(".market-tabs button")
+.forEach(b=>
+b.classList.remove("active")
+);
+
+
+button.classList.add("active");
+
+
+if(type==="FUTURES"){
+
+alert(
+"Futures terminal selected. Futures data engine will be connected in the next build."
+);
+
+}
+
+}
+
+
+function searchCoins(){
+
+const s=
+document
+.getElementById("search")
+.value
+.toUpperCase();
+
+
+document
+.querySelectorAll(".coin")
+.forEach(c=>
+
+c.style.display=
+c.innerText
+.toUpperCase()
+.includes(s)
+?"flex"
+:"none"
+
+);
+
+}
+
+
+resizeCanvas();
+
+loadHistory();
+
+connectMarket();
 
 </script>
 
