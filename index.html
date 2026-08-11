@@ -1,274 +1,319 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SMC AI Scanner — Binance Style Chart</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMC AI Scanner — Chart Engine</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#0b0e11;color:#eaecef;font-family:Arial,Helvetica,sans-serif}
-button,input{font:inherit}.app{height:100%;display:flex;flex-direction:column}
-.header{height:58px;flex:0 0 58px;background:#181a20;border-bottom:1px solid #2b2f36;display:flex;align-items:center;gap:20px;padding:0 16px}
-.logo{font-weight:700;font-size:20px;color:#f0b90b;white-space:nowrap}.tabs button{border:0;background:none;color:#848e9c;padding:9px 14px;font-weight:700;cursor:pointer}.tabs .active{color:#f0b90b;border-bottom:2px solid #f0b90b}
-.search{margin-left:auto}.search input{width:190px;background:#2b2f36;border:1px solid #3b4048;color:#fff;padding:8px 11px;border-radius:6px;outline:0}
-.body{min-height:0;flex:1;display:flex}.watch{width:220px;min-width:150px;background:#161a1e;border-right:1px solid #2b2f36;overflow:auto}.watch.hidden{display:none}
-.watch-title{padding:14px 16px;color:#848e9c;font-size:12px;border-bottom:1px solid #2b2f36}.coin{padding:12px 15px;display:flex;justify-content:space-between;border-bottom:1px solid #20242a;cursor:pointer}.coin:hover,.coin.active{background:#1e2329}.coin b{font-size:14px}.coin span{color:#d1d4dc}
-.center{min-width:0;min-height:0;flex:1;display:flex;flex-direction:column}.chart-head{height:108px;flex:0 0 108px;padding:10px 16px;border-bottom:1px solid #2b2f36}.pair{font-size:20px;font-weight:700}.price{font-size:22px;color:#0ecb81;margin-left:14px}.stats{font-size:12px;color:#848e9c;margin-top:8px;display:flex;gap:22px}.tf{display:flex;gap:3px;margin-top:12px}.tf button{border:0;background:none;color:#848e9c;padding:5px 9px;cursor:pointer}.tf button:hover,.tf .active{background:#2b2f36;color:#f0b90b;border-radius:4px}
-.chart-row{min-height:0;flex:1;display:flex}.tools{width:52px;flex:0 0 52px;background:#181a20;border-right:1px solid #2b2f36;display:flex;flex-direction:column;align-items:center;padding:7px 4px;gap:4px;overflow:auto;z-index:20}.tools.hidden{display:none}
-.tool{width:40px;height:40px;border:0;border-radius:7px;background:none;color:#d1d4dc;cursor:pointer;font-size:18px;display:flex;flex-direction:column;align-items:center;justify-content:center}.tool:hover,.tool.active{background:#3a3f47;color:#f0b90b}.tool label{font-size:7px;color:#848e9c;margin-top:1px}.sep{width:34px;height:1px;background:#3b3f45;margin:3px}
-.stage{position:relative;min-width:0;min-height:0;flex:1;overflow:hidden;background:#0b0e11}.stage canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
-.axis{position:absolute;right:0;top:0;bottom:24px;width:76px;background:rgba(11,14,17,.88);border-left:1px solid #20242a;pointer-events:none}.axis div{position:absolute;right:5px;transform:translateY(-50%);font-size:10px;color:#848e9c}
-.timeaxis{position:absolute;left:0;right:76px;bottom:0;height:24px;background:rgba(24,26,32,.95);border-top:1px solid #2b2f36;pointer-events:none}.timeaxis span{position:absolute;bottom:5px;color:#69717d;font-size:10px;white-space:nowrap}
-.smc{position:absolute;top:10px;left:10px;background:rgba(22,26,30,.94);border:1px solid #30353d;border-radius:6px;padding:9px 12px;font-size:12px;z-index:5;min-width:180px}.smc strong{display:block;color:#f0b90b;margin-bottom:6px}.smc div{display:flex;justify-content:space-between;margin:4px 0}.wait{color:#f0b90b}
-.menu{position:absolute;left:6px;top:7px;width:310px;max-height:calc(100% - 14px);overflow:auto;background:#202124;border:1px solid #45484d;border-radius:7px;box-shadow:0 12px 40px #0009;z-index:50;display:none}.menu.open{display:block}.menu h4{margin:0;padding:10px 13px;color:#848e9c;font-size:11px;border-bottom:1px solid #3b3d40}.mi{height:45px;display:flex;align-items:center;padding:0 12px;gap:12px;cursor:pointer}.mi:hover{background:#303236}.mi .ico{width:30px;text-align:center;font-size:18px}.mi .fav{margin-left:auto;color:#f0b90b}
-.right{width:280px;min-width:180px;background:#161a1e;border-left:1px solid #2b2f36;overflow:auto}.right.hidden{display:none}.right-title{padding:15px;font-size:15px;font-weight:700;border-bottom:1px solid #2b2f36}.book{padding:11px}.row{display:grid;grid-template-columns:1fr 1fr 1fr;font-size:11px;padding:3px 0}.head{color:#5e6673;margin-bottom:6px}.ask{color:#f6465d}.bid{color:#0ecb81}.signal{margin:14px 11px;padding:13px;background:#1e2329;border:1px solid #30353d;border-radius:7px}.signal b{color:#f0b90b}.signal strong{display:block;color:#0ecb81;font-size:18px;margin-top:8px}
-.bottom{height:25px;flex:0 0 25px;background:#181a20;border-top:1px solid #2b2f36;color:#848e9c;font-size:10px;padding:6px 12px;display:flex;justify-content:space-between}.bottom button{border:0;background:none;color:#848e9c;cursor:pointer}
-.float{position:absolute;right:84px;top:8px;z-index:10;display:flex;gap:3px}.float button{border:1px solid #333942;background:#181a20;color:#cfd3d8;border-radius:4px;width:29px;height:27px;cursor:pointer}.float button:hover{color:#f0b90b}
-.selected{outline:1px dashed #f0b90b;outline-offset:3px}
-.locked .hint{display:none}
-@media(max-width:950px){.watch,.right{display:none}.tools{width:48px;flex-basis:48px}.search{display:none}.smc{min-width:165px}}
-
-.object-toolbar{position:absolute;display:none;z-index:60;background:#20242a;border:1px solid #454a52;border-radius:6px;padding:4px;gap:4px;box-shadow:0 8px 24px #0008}
-.object-toolbar.show{display:flex}.object-toolbar button{border:0;background:#30353d;color:#eaecef;padding:5px 8px;border-radius:4px;cursor:pointer;font-size:11px}.object-toolbar button:hover{color:#f0b90b}
-.handle{position:absolute;width:8px;height:8px;border:1px solid #f0b90b;background:#181a20;border-radius:50%;z-index:55;pointer-events:none}
-.crosshair-x,.crosshair-y{position:absolute;pointer-events:none;z-index:4;display:none}.crosshair-x{height:1px;left:0;right:76px;background:#5e6673}.crosshair-y{width:1px;top:0;bottom:24px;background:#5e6673}
-.settings-panel{position:absolute;right:84px;top:42px;z-index:70;display:none;background:#202124;border:1px solid #45484d;border-radius:7px;padding:12px;width:240px;box-shadow:0 10px 35px #0009}.settings-panel.show{display:block}.settings-panel h4{margin:0 0 10px;color:#f0b90b}.settings-panel label{display:block;font-size:11px;color:#9aa1aa;margin:8px 0 3px}.settings-panel input,.settings-panel select{width:100%;background:#161a1e;color:#fff;border:1px solid #3b4048;padding:6px;border-radius:4px}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#0b0e11;color:#eaecef;font-family:Arial,Helvetica,sans-serif}
+button,input,select{font:inherit}
+.app{height:100%;display:flex;flex-direction:column}
+.top{height:58px;flex:0 0 58px;background:#181a20;border-bottom:1px solid #2b2f36;display:flex;align-items:center;padding:0 16px;gap:22px}
+.logo{font-size:20px;font-weight:700;color:#f0b90b}.tabs button{background:transparent;border:0;color:#848e9c;padding:10px 14px;font-weight:700}.tabs .active{color:#f0b90b;border-bottom:2px solid #f0b90b}
+.search{margin-left:auto}.search input{background:#2b2f36;border:1px solid #3b4048;color:#fff;padding:8px 11px;border-radius:6px;width:190px}
+.body{flex:1;min-height:0;display:flex}
+.watch{width:220px;min-width:150px;background:#161a1e;border-right:1px solid #2b2f36;overflow:auto}.watch.hide{display:none}
+.watch-title{padding:14px 16px;color:#848e9c;font-size:12px;border-bottom:1px solid #2b2f36}.coin{display:flex;justify-content:space-between;padding:12px 15px;border-bottom:1px solid #20242a;cursor:pointer}.coin:hover,.coin.active{background:#1e2329}.coin b{font-size:13px}.coin span{color:#d1d4dc;font-size:12px}
+.center{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column}
+.head{height:108px;flex:0 0 108px;padding:10px 16px;border-bottom:1px solid #2b2f36}.pair{font-size:20px;font-weight:700}.live{font-size:22px;color:#0ecb81;margin-left:14px}.stats{margin-top:8px;color:#848e9c;font-size:12px;display:flex;gap:20px}.tf{margin-top:12px;display:flex;gap:3px}.tf button{border:0;background:transparent;color:#848e9c;padding:5px 9px;cursor:pointer}.tf button:hover,.tf .active{background:#2b2f36;color:#f0b90b;border-radius:4px}
+.chartrow{flex:1;min-height:0;display:flex}.toolbar{width:54px;flex:0 0 54px;background:#181a20;border-right:1px solid #2b2f36;display:flex;flex-direction:column;align-items:center;padding:7px 5px;gap:4px;overflow:auto}.toolbar.hide{display:none}
+.tool{width:42px;height:40px;border:0;background:transparent;color:#c8cdd4;border-radius:6px;cursor:pointer;font-size:18px;display:flex;flex-direction:column;align-items:center;justify-content:center}.tool:hover,.tool.active{background:#343941;color:#f0b90b}.tool small{font-size:7px;color:#848e9c;margin-top:2px}.sep{width:34px;height:1px;background:#3b4048;margin:3px}
+.stage{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#0b0e11}.stage canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.axis{position:absolute;right:0;top:0;bottom:25px;width:78px;background:rgba(11,14,17,.9);border-left:1px solid #20242a;pointer-events:none}.axis span{position:absolute;right:5px;transform:translateY(-50%);font-size:10px;color:#848e9c}
+.time{position:absolute;left:0;right:78px;bottom:0;height:25px;background:#181a20;border-top:1px solid #2b2f36;pointer-events:none}.time span{position:absolute;bottom:5px;font-size:10px;color:#69717d;white-space:nowrap}
+.crossx,.crossy{position:absolute;background:#5e6673;pointer-events:none;z-index:4;display:none}.crossx{height:1px;left:0;right:78px}.crossy{width:1px;top:0;bottom:25px}
+.menu{position:absolute;left:7px;top:7px;width:290px;max-height:calc(100% - 14px);overflow:auto;background:#202124;border:1px solid #45484d;border-radius:7px;box-shadow:0 10px 35px #0009;display:none;z-index:30}.menu.show{display:block}.menu h4{margin:0;padding:10px 13px;color:#848e9c;font-size:11px;border-bottom:1px solid #3b3d40}.mi{height:45px;display:flex;align-items:center;gap:12px;padding:0 12px;cursor:pointer}.mi:hover{background:#303236}.mi i{width:28px;text-align:center;font-style:normal;font-size:18px}.mi b{font-weight:400;font-size:13px}.mi em{margin-left:auto;color:#f0b90b;font-style:normal}
+.selection{position:absolute;display:none;z-index:40;background:#20242a;border:1px solid #454a52;border-radius:6px;padding:4px;gap:4px;box-shadow:0 8px 24px #0008}.selection.show{display:flex}.selection button{border:0;background:#30353d;color:#eaecef;border-radius:4px;padding:5px 7px;font-size:10px;cursor:pointer}.selection button:hover{color:#f0b90b}
+.settings{position:absolute;right:85px;top:42px;width:250px;background:#202124;border:1px solid #45484d;border-radius:7px;padding:12px;z-index:50;display:none;box-shadow:0 10px 35px #0009}.settings.show{display:block}.settings h4{margin:0 0 10px;color:#f0b90b}.settings label{display:block;color:#9aa1aa;font-size:11px;margin:8px 0 4px}.settings input,.settings select{width:100%;background:#161a1e;border:1px solid #3b4048;color:#fff;padding:6px;border-radius:4px}
+.float{position:absolute;right:86px;top:8px;display:flex;gap:4px;z-index:20}.float button{width:30px;height:28px;background:#181a20;border:1px solid #343942;color:#c8cdd4;border-radius:4px;cursor:pointer}.float button:hover{color:#f0b90b}
+.right{width:280px;min-width:180px;background:#161a1e;border-left:1px solid #2b2f36;overflow:auto}.right.hide{display:none}.right-title{padding:15px;font-weight:700;border-bottom:1px solid #2b2f36}.book{padding:11px}.row{display:grid;grid-template-columns:1fr 1fr 1fr;font-size:11px;padding:3px 0}.row.head{color:#5e6673;height:auto;padding:3px 0}.ask{color:#f6465d}.bid{color:#0ecb81}
+.footer{height:25px;flex:0 0 25px;background:#181a20;border-top:1px solid #2b2f36;padding:6px 12px;color:#848e9c;font-size:10px;display:flex;justify-content:space-between}
+@media(max-width:900px){.watch,.right{display:none}.toolbar{width:48px;flex-basis:48px}.search{display:none}}
 </style>
 </head>
 <body>
 <div class="app">
-<header class="header">
-<div class="logo">SMC AI SCANNER</div>
-<div class="tabs"><button class="active">Spot</button><button>Futures</button></div>
-<div class="search"><input id="search" placeholder="Search symbol..."></div>
+<header class="top">
+  <div class="logo">SMC AI SCANNER</div>
+  <div class="tabs"><button class="active">Spot</button><button>Futures</button></div>
+  <div class="search"><input id="search" placeholder="Search symbol..."></div>
 </header>
 
 <div class="body">
 <aside class="watch" id="watch">
-<div class="watch-title">MARKETS</div>
-<div class="coin active" data-s="BTCUSDT"><b>BTC/USDT</b><span id="p-BTCUSDT">--</span></div>
-<div class="coin" data-s="ETHUSDT"><b>ETH/USDT</b><span id="p-ETHUSDT">--</span></div>
-<div class="coin" data-s="SOLUSDT"><b>SOL/USDT</b><span id="p-SOLUSDT">--</span></div>
-<div class="coin" data-s="AVAXUSDT"><b>AVAX/USDT</b><span id="p-AVAXUSDT">--</span></div>
-<div class="coin" data-s="SEIUSDT"><b>SEI/USDT</b><span id="p-SEIUSDT">--</span></div>
-<div class="coin" data-s="TIAUSDT"><b>TIA/USDT</b><span id="p-TIAUSDT">--</span></div>
-<div class="coin" data-s="API3USDT"><b>API3/USDT</b><span id="p-API3USDT">--</span></div>
+  <div class="watch-title">MARKETS</div>
+  <div class="coin active" data-symbol="BTCUSDT"><b>BTC/USDT</b><span id="price-BTCUSDT">--</span></div>
+  <div class="coin" data-symbol="ETHUSDT"><b>ETH/USDT</b><span id="price-ETHUSDT">--</span></div>
+  <div class="coin" data-symbol="SOLUSDT"><b>SOL/USDT</b><span id="price-SOLUSDT">--</span></div>
+  <div class="coin" data-symbol="AVAXUSDT"><b>AVAX/USDT</b><span id="price-AVAXUSDT">--</span></div>
+  <div class="coin" data-symbol="SEIUSDT"><b>SEI/USDT</b><span id="price-SEIUSDT">--</span></div>
+  <div class="coin" data-symbol="TIAUSDT"><b>TIA/USDT</b><span id="price-TIAUSDT">--</span></div>
+  <div class="coin" data-symbol="API3USDT"><b>API3/USDT</b><span id="price-API3USDT">--</span></div>
 </aside>
 
-<section class="center">
-<div class="chart-head">
-<div><span class="pair" id="pair">BTC/USDT</span><span class="price" id="live">--</span></div>
-<div class="stats"><span>24h Change <b id="chg">--</b></span><span>24h High <b id="hi">--</b></span><span>24h Low <b id="lo">--</b></span></div>
-<div class="tf"><button data-t="1m">1m</button><button data-t="5m">5m</button><button data-t="15m" class="active">15m</button><button data-t="1h">1H</button><button data-t="4h">4H</button><button data-t="1d">1D</button><button data-t="1w">1W</button></div>
-</div>
+<main class="center">
+  <div class="head">
+    <div><span class="pair" id="pair">BTC/USDT</span><span class="live" id="live">--</span></div>
+    <div class="stats"><span>24h Change <b id="change">--</b></span><span>24h High <b id="high">--</b></span><span>24h Low <b id="low">--</b></span></div>
+    <div class="tf"><button data-tf="1m">1m</button><button data-tf="5m">5m</button><button data-tf="15m" class="active">15m</button><button data-tf="1h">1H</button><button data-tf="4h">4H</button><button data-tf="1d">1D</button><button data-tf="1w">1W</button></div>
+  </div>
 
-<div class="chart-row">
-<div class="tools" id="tools">
-<button class="tool active" data-tool="cross">✛<label>Cross</label></button>
-<button class="tool" data-tool="dot">•<label>Dot</label></button>
-<button class="tool" data-tool="arrow">➤<label>Arrow</label></button>
-<button class="tool" data-tool="magnet">🧲<label>Magnet</label></button>
-<div class="sep"></div>
-<button class="tool" data-menu="lines">╱<label>Lines</label></button>
-<button class="tool" data-menu="fib">F<label>Fib</label></button>
-<button class="tool" data-menu="shapes">□<label>Shapes</label></button>
-<button class="tool" data-menu="measure">⌖<label>Measure</label></button>
-<button class="tool" data-menu="annotate">T<label>Annotate</label></button>
-<div class="sep"></div>
-<button class="tool" data-tool="long">↗<label>Long</label></button>
-<button class="tool" data-tool="short">↘<label>Short</label></button>
-<button class="tool" data-tool="eraser">⌫<label>Erase</label></button>
-<button class="tool" data-tool="lock">🔒<label>Lock</label></button>
-<div class="sep"></div>
-<button class="tool" data-tool="zoomIn">＋<label>Zoom+</label></button>
-<button class="tool" data-tool="zoomOut">－<label>Zoom−</label></button>
-<button class="tool" data-tool="reset">⟳<label>Reset</label></button>
-</div>
+  <div class="chartrow">
+    <nav class="toolbar" id="toolbar">
+      <button class="tool active" data-tool="cursor">✛<small>Cross</small></button>
+      <button class="tool" data-tool="dot">•<small>Dot</small></button>
+      <button class="tool" data-tool="arrow">➤<small>Arrow</small></button>
+      <button class="tool" id="magnet">🧲<small>Magnet</small></button>
+      <div class="sep"></div>
+      <button class="tool" data-menu="lines">╱<small>Lines</small></button>
+      <button class="tool" data-menu="fib">F<small>Fib</small></button>
+      <button class="tool" data-menu="shapes">□<small>Shapes</small></button>
+      <button class="tool" data-tool="eraser">⌫<small>Erase</small></button>
+      <div class="sep"></div>
+      <button class="tool" data-tool="zoomIn">＋<small>Zoom+</small></button>
+      <button class="tool" data-tool="zoomOut">－<small>Zoom−</small></button>
+      <button class="tool" data-tool="reset">⟳<small>Reset</small></button>
+    </nav>
 
-<div class="stage" id="stage">
-<canvas id="chart"></canvas>
-<div class="float">
-<button id="settings" title="Chart settings">⚙</button>
-<button id="hideWatch" title="Hide watchlist">◀</button><button id="hideTools" title="Hide tools">☰</button><button id="hideRight" title="Hide order book">▶</button><button id="full" title="Fullscreen">⛶</button>
-</div>
-<div class="smc"><strong>CHART MODE — SMC OFF</strong><div><span>Drawing engine</span><span class="wait">READY</span></div><div><span>Magnet</span><span id="mag">OFF</span></div><div><span>Objects</span><span id="obj">0</span></div></div>
-<div class="axis" id="axis"></div><div class="timeaxis" id="timeaxis"></div><div class="object-toolbar" id="objectToolbar">
-<button id="objLock">Lock</button><button id="objHide">Hide</button><button id="objDelete">Delete</button><button id="objClone">Clone</button>
-</div>
-<div class="settings-panel" id="settingsPanel">
-<h4>Drawing Settings</h4>
-<label>Line width</label><select id="lineWidth"><option value="1">1</option><option value="1.5" selected>1.5</option><option value="2">2</option><option value="3">3</option></select>
-<label>Color</label><input id="lineColor" type="color" value="#f0b90b">
-<label>Background opacity</label><input id="fillOpacity" type="range" min="0" max="60" value="13">
-</div>
-<div class="crosshair-x" id="crossX"></div><div class="crosshair-y" id="crossY"></div>
-<div class="menu" id="menu"></div>
-</div>
-</div>
-</section>
+    <section class="stage" id="stage">
+      <canvas id="chart"></canvas>
+      <div class="axis" id="axis"></div>
+      <div class="time" id="time"></div>
+      <div class="crossx" id="crossx"></div><div class="crossy" id="crossy"></div>
+
+      <div class="float">
+        <button id="hideWatch">◀</button><button id="hideTools">☰</button><button id="hideRight">▶</button><button id="settingsBtn">⚙</button><button id="fullscreen">⛶</button>
+      </div>
+
+      <div class="selection" id="selection">
+        <button id="deleteObject">Delete</button><button id="cloneObject">Clone</button><button id="lockObject">Lock</button><button id="settingsObject">Settings</button>
+      </div>
+
+      <div class="settings" id="settings">
+        <h4>Drawing Settings</h4>
+        <label>Color</label><input type="color" id="color" value="#f0b90b">
+        <label>Line width</label><select id="width"><option>1</option><option selected>1.5</option><option>2</option><option>3</option></select>
+        <label>Fill opacity</label><input type="range" id="opacity" min="0" max="60" value="12">
+      </div>
+
+      <div class="menu" id="menu"></div>
+    </section>
+  </div>
+</main>
 
 <aside class="right" id="right">
-<div class="right-title">ORDER BOOK</div><div class="book"><div class="row head"><span>Price</span><span>Amount</span><span>Total</span></div><div id="asks"></div><div style="height:12px"></div><div id="bids"></div></div>
-<div class="signal"><b>CHART FIRST</b><strong>SMC SIGNALS OFF</strong><p>Finish drawing and chart controls before adding the SMC engine.</p></div>
+  <div class="right-title">ORDER BOOK</div>
+  <div class="book"><div class="row head"><span>Price</span><span>Amount</span><span>Total</span></div><div id="asks"></div><div style="height:12px"></div><div id="bids"></div></div>
 </aside>
 </div>
-<div class="bottom"><span>Click = select • Drag handles = resize • Drag object = move • Wheel = zoom • Ctrl/Cmd = strong magnet</span><button id="clear">Clear drawings</button></div>
+
+<footer class="footer"><span>Click = select • Drag handles = resize • Drag object = move • Wheel = zoom • Ctrl/Cmd = temporary strong magnet</span><button id="clear" style="background:none;border:0;color:#848e9c;cursor:pointer">Clear drawings</button></footer>
 </div>
 
 <script>
-const C=document.getElementById('chart'),X=C.getContext('2d'),S=document.getElementById('stage');
-let sym='BTCUSDT',tf='15m',ws=null,bars=[],objects=[],mode='cross',magnet=0,locked=false,visible=80,offset=0,drag=null,history=[],future=[];
-const menus={
-lines:[['╱','Trendline','trend'],['╱','Ray','ray'],['▱','Info line','info'],['╱','Extended line','extended'],['∠','Trend angle','angle'],['—','Horizontal line','hline'],['—','Horizontal ray','hray'],['│','Vertical line','vline'],['✛','Cross line','crossline'],['◇','Parallel channel','channel'],['◆','Price level','price']],
-fib:[['F','Fib retracement','fib'],['F','Trend-based Fib extension','fibext'],['F','Fib channel','fibchannel'],['F','Fib time zone','fibtime'],['F','Pitchfork','pitchfork'],['F','Gann fan','gann'],['F','Fib circles','fibcircle'],['F','Fib spiral','fibspiral'],['F','Fib wedge','fibwedge']],
-shapes:[['□','Rectangle','rect'],['○','Circle','circle'],['◯','Ellipse','ellipse'],['△','Triangle','triangle'],['⌁','Polyline','polyline'],['⌒','Curve','curve'],['✎','Path','path'],['▱','Rotated rectangle','rotrect']],
-measure:[['↗','Long position','long'],['↘','Short position','short'],['↔','Price range','pricerange'],['↕','Date range','daterange'],['⌗','Date & price range','bothrange'],['▤','Fixed range volume profile','volume'],['⌁','Forecast','forecast'],['▥','Bars pattern','bars']],
-annotate:[['T','Text','text'],['▱','Note','note'],['◆','Price label','label'],['➤','Arrow marker','arrowmark'],['★','Icon','icon']]
+const canvas=document.getElementById('chart'),ctx=canvas.getContext('2d'),stage=document.getElementById('stage');
+let symbol='BTCUSDT',interval='15m',ws=null,bars=[];
+let objects=[],selected=-1,mode='cursor',magnetMode=false,lockedAll=false;
+let visible=90,offset=0,drag=null,undoStack=[],redoStack=[];
+
+const toolMenus={
+ lines:[
+  ['╱','Trend Line','trend'],['↗','Ray','ray'],['╱','Extended Line','extended'],
+  ['—','Horizontal Line','hline'],['—','Horizontal Ray','hray'],['│','Vertical Line','vline'],['✛','Cross Line','crossline'],['◇','Parallel Channel','channel']
+ ],
+ fib:[
+  ['F','Fib Retracement','fib'],['F','Trend-Based Fib Extension','fibext'],['F','Fib Channel','fibchannel'],['F','Fib Time Zone','fibtime'],['F','Pitchfork','pitchfork'],['F','Gann Fan','gann']
+ ],
+ shapes:[
+  ['□','Rectangle','rect'],['○','Circle','circle'],['◯','Ellipse','ellipse'],['△','Triangle','triangle'],['⌁','Polyline','polyline'],['⌒','Curve','curve'],['✎','Path','path']
+ ]
 };
-function fmt(p){return p>=1000?p.toLocaleString(undefined,{maximumFractionDigits:2}):p>=1?p.toFixed(4):p.toFixed(6)}
-function resize(){let r=S.getBoundingClientRect(),d=devicePixelRatio||1;C.width=r.width*d;C.height=r.height*d;X.setTransform(d,0,0,d,0,0);draw()}
+
+function fmt(n){n=Number(n);if(!Number.isFinite(n))return '--';if(n>=1000)return n.toLocaleString(undefined,{maximumFractionDigits:2});if(n>=1)return n.toFixed(4);return n.toFixed(6)}
+function save(){localStorage.setItem('smcObjects:'+symbol+':'+interval,JSON.stringify(objects))}
+function load(){try{objects=JSON.parse(localStorage.getItem('smcObjects:'+symbol+':'+interval)||'[]')}catch(e){objects=[]}selected=-1}
+function resize(){const r=stage.getBoundingClientRect(),d=devicePixelRatio||1;canvas.width=r.width*d;canvas.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);draw()}
 window.addEventListener('resize',resize);
-function connect(){
- if(ws)try{ws.close()}catch(e){}
- bars=[];
- fetch(`https://api.binance.com/api/v3/klines?symbol=${sym}&interval=${tf}&limit=500`).then(r=>r.json()).then(a=>{bars=a.map(k=>({t:+k[0],o:+k[1],h:+k[2],l:+k[3],c:+k[4]}));loadObjects();draw()}).catch(()=>draw());
- ws=new WebSocket(`wss://stream.binance.com:9443/ws/${sym.toLowerCase()}@kline_${tf}`);
- ws.onmessage=e=>{let k=JSON.parse(e.data).k;if(!k)return;let b={t:+k.t,o:+k.o,h:+k.h,l:+k.l,c:+k.c},z=bars[bars.length-1];if(z&&z.t===b.t)bars[bars.length-1]=b;else bars.push(b);if(bars.length>500)bars.shift();setPrice(b.c);draw()};
+
+function view(){
+ const end=Math.max(1,bars.length-offset),start=Math.max(0,end-visible);
+ return bars.slice(start,end)
 }
-function setPrice(p){document.getElementById('live').textContent=fmt(p);let q=document.getElementById('p-'+sym);if(q)q.textContent=fmt(p)}
-function view(){let end=Math.max(1,bars.length-offset),start=Math.max(0,end-visible);return bars.slice(start,end)}
-function geom(){let v=view(),w=S.clientWidth-76,h=S.clientHeight-24,n=v.length,g=w/Math.max(1,n);let min=Math.min(...v.map(b=>b.l)),max=Math.max(...v.map(b=>b.h));let pad=(max-min)*.08||1;return{v,w,h,n,g,min:min-pad,max:max+pad}}
-function yprice(p,G){return G.h-(p-G.min)/(G.max-G.min)*G.h}
-function xyPrice(x,y,G){let i=Math.max(0,Math.min(G.n-1,Math.round(x/G.g-.5)));return yprice(G.v[i].c,G)}
-function snapPoint(p,G,strong=false){if(!magnet&&!strong)return p;let i=Math.max(0,Math.min(G.n-1,Math.round(p.x/G.g-.5))),b=G.v[i],pts=[b.o,b.h,b.l,b.c];let best=pts[0],bd=1e99;pts.forEach(q=>{let d=Math.abs(yprice(q,G)-p.y);if(d<bd){bd=d;best=q}});return{x:(i+.5)*G.g,y:yprice(best,G)}}
-function draw(){
- let G=bars.length?geom():null,w=S.clientWidth,h=S.clientHeight;X.clearRect(0,0,w,h);X.fillStyle='#0b0e11';X.fillRect(0,0,w,h);
- if(!G){X.fillStyle='#848e9c';X.font='14px Arial';X.fillText('Connecting to Binance market data...',20,30);return}
- X.strokeStyle='#1c2026';X.lineWidth=1;for(let i=0;i<7;i++){let yy=G.h*i/6;X.beginPath();X.moveTo(0,yy);X.lineTo(G.w,yy);X.stroke()}
- G.v.forEach((b,i)=>{let x=(i+.5)*G.g,yo=yprice(b.o,G),yc=yprice(b.c,G),yh=yprice(b.h,G),yl=yprice(b.l,G),up=b.c>=b.o;X.strokeStyle=X.fillStyle=up?'#0ecb81':'#f6465d';X.beginPath();X.moveTo(x,yh);X.lineTo(x,yl);X.stroke();X.fillRect(x-Math.max(1,G.g*.3),Math.min(yo,yc),Math.max(2,G.g*.6),Math.max(1,Math.abs(yc-yo)))});
- objects.forEach(o=>{if(!o.hidden)renderObject(o,G)});
- let axis=document.getElementById('axis');axis.innerHTML='';for(let i=0;i<7;i++){let q=G.max-(G.max-G.min)*i/6,d=document.createElement('div');d.style.top=(G.h*i/6)+'px';d.textContent=fmt(q);axis.appendChild(d)}
- let ta=document.getElementById('timeaxis');ta.innerHTML='';for(let i=0;i<6;i++){let idx=Math.min(G.n-1,Math.floor(i*(G.n-1)/5)),d=document.createElement('span');d.style.left=((idx+.5)*G.g)+'px';d.textContent=new Date(G.v[idx].t).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});ta.appendChild(d)}
- document.getElementById('obj').textContent=objects.length;
+function geometry(){
+ const v=view(),w=stage.clientWidth-78,h=stage.clientHeight-25,n=Math.max(1,v.length),gap=w/n;
+ let min=v.length?Math.min(...v.map(b=>b.low)):0,max=v.length?Math.max(...v.map(b=>b.high)):1;
+ let pad=(max-min)*.08||1;return {v,w,h,n,gap,min:min-pad,max:max+pad}
 }
-function renderObject(o,G){
- if(!o.a||o.hidden)return;X.save();X.strokeStyle=o.color||'#f0b90b';X.fillStyle=(o.color||'#f0b90b')+'22';X.lineWidth=o.width||1.5;let a=o.a,b=o.b||o.a;
- if(o.type==='dot'){X.beginPath();X.arc(a.x,a.y,4,0,Math.PI*2);X.fill()}
- else if(o.type==='text'||o.type==='note'||o.type==='label'){X.fillStyle=o.color||'#f0b90b';X.font='14px Arial';X.fillText(o.text||'Text',a.x,a.y)}
- else if(['hline','hray','price'].includes(o.type)){X.beginPath();X.moveTo(0,a.y);X.lineTo(G.w,a.y);X.stroke()}
- else if(o.type==='vline'){X.beginPath();X.moveTo(a.x,0);X.lineTo(a.x,G.h);X.stroke()}
- else if(o.type==='crossline'){X.beginPath();X.moveTo(a.x,0);X.lineTo(a.x,G.h);X.moveTo(0,a.y);X.lineTo(G.w,a.y);X.stroke()}
- else if(o.type==='rect'){X.strokeRect(a.x,a.y,b.x-a.x,b.y-a.y);X.fillRect(a.x,a.y,b.x-a.x,b.y-a.y)}
- else if(o.type==='circle'||o.type==='ellipse'){let rx=Math.abs(b.x-a.x)/2,ry=o.type==='circle'?rx:Math.abs(b.y-a.y)/2;X.beginPath();X.ellipse((a.x+b.x)/2,(a.y+b.y)/2,rx,ry,0,0,Math.PI*2);X.stroke()}
- else if(o.type==='triangle'){X.beginPath();X.moveTo(a.x,a.y);X.lineTo(b.x,a.y);X.lineTo((a.x+b.x)/2,b.y);X.closePath();X.stroke()}
- else if(o.type==='fib'||o.type==='fibext'){let levels=[0,.236,.382,.5,.618,.786,1];levels.forEach(f=>{let yy=a.y+(b.y-a.y)*f;X.beginPath();X.moveTo(Math.min(a.x,b.x),yy);X.lineTo(Math.max(a.x,b.x),yy);X.stroke();X.font='10px Arial';X.fillText((f*100).toFixed(1)+'%',Math.min(a.x,b.x)+4,yy-3)})}
- else if(o.type==='volume'){X.fillStyle='#8b5cf622';X.fillRect(Math.min(a.x,b.x),0,Math.abs(b.x-a.x),G.h)}
- else if(['trend','ray','extended','info','angle','pitchfork','gann','channel','pricerange','daterange','bothrange','forecast','bars','polyline','curve','path','rotrect'].includes(o.type)){X.beginPath();X.moveTo(a.x,a.y);X.lineTo(b.x,b.y);X.stroke()}
- else if(o.type==='arrow'||o.type==='arrowmark'||o.type==='long'||o.type==='short'){X.beginPath();X.moveTo(a.x,a.y);X.lineTo(b.x,b.y);X.stroke();let ang=Math.atan2(b.y-a.y,b.x-a.x),s=10;X.beginPath();X.moveTo(b.x,b.y);X.lineTo(b.x-s*Math.cos(ang-.5),b.y-s*Math.sin(ang-.5));X.lineTo(b.x-s*Math.cos(ang+.5),b.y-s*Math.sin(ang+.5));X.closePath();X.fill()}
- X.restore()
+function yFromPrice(p,g){return g.h-(p-g.min)/(g.max-g.min)*g.h}
+function priceFromY(y,g){return g.min+(g.h-y)/g.h*(g.max-g.min)}
+function pointFromEvent(e,g,strong=false){
+ const r=stage.getBoundingClientRect();let x=e.clientX-r.left,y=e.clientY-r.top;
+ if(magnetMode||strong){
+  let i=Math.max(0,Math.min(g.n-1,Math.round(x/g.gap-.5))),b=g.v[i],vals=[b.open,b.high,b.low,b.close];
+  let p=priceFromY(y,g),best=vals[0],dist=Infinity;
+  vals.forEach(q=>{let d=Math.abs(q-p);if(d<dist){dist=d;best=q}});
+  x=(i+.5)*g.gap;y=yFromPrice(best,g)
+ }
+ return{x,y}
 }
-function save(){localStorage.setItem('smcDraw:'+sym+':'+tf,JSON.stringify(objects))}
-function loadObjects(){try{objects=JSON.parse(localStorage.getItem('smcDraw:'+sym+':'+tf)||'[]')}catch(e){objects=[]}}
-function choose(t){mode=t;document.getElementById('menu').classList.remove('open');document.querySelectorAll('.tool').forEach(b=>b.classList.remove('active'));let b=document.querySelector(`[data-tool="${t}"]`);if(b)b.classList.add('active')}
-function openMenu(k){let m=document.getElementById('menu');m.innerHTML='<h4>'+k.toUpperCase()+'</h4>'+menus[k].map(a=>`<div class="mi" data-p="${a[2]}"><span class="ico">${a[0]}</span><span>${a[1]}</span><span class="fav">★</span></div>`).join('');m.classList.toggle('open');m.querySelectorAll('.mi').forEach(x=>x.onclick=()=>choose(x.dataset.p))}
-document.querySelectorAll('.tool').forEach(b=>b.onclick=()=>{if(b.dataset.menu)return openMenu(b.dataset.menu);let t=b.dataset.tool;if(t==='magnet'){magnet=magnet?0:2;document.getElementById('mag').textContent=magnet===2?'STRONG':'OFF';b.classList.toggle('active',!!magnet);return}if(t==='zoomIn'){visible=Math.max(25,visible-12);draw();return}if(t==='zoomOut'){visible=Math.min(300,visible+12);draw();return}if(t==='reset'){visible=80;offset=0;draw();return}if(t==='lock'){locked=!locked;b.classList.toggle('active',locked);return}choose(t)});
-S.addEventListener('wheel',e=>{e.preventDefault();visible=Math.max(20,Math.min(300,visible+(e.deltaY>0?10:-10)));draw()},{passive:false});
-S.addEventListener('dblclick',()=>{offset=0;visible=80;draw()});
-let selected=-1,editPart=null,hover=-1;
-function near(a,b,t=12){return Math.hypot(a.x-b.x,a.y-b.y)<=t}
-function objectBounds(o){
- if(!o.a)return null; if(!o.b)return {x1:o.a.x,y1:o.a.y,x2:o.a.x,y2:o.a.y};
- return {x1:Math.min(o.a.x,o.b.x),y1:Math.min(o.a.y,o.b.y),x2:Math.max(o.a.x,o.b.x),y2:Math.max(o.a.y,o.b.y)}
-}
-function hitTest(p){
- for(let i=objects.length-1;i>=0;i--){let o=objects[i],q=objectBounds(o);if(!q)continue;
-   if(near(p,o.a)||near(p,o.b))return {i,part:near(p,o.a)?'a':'b'};
-   if(p.x>=q.x1-7&&p.x<=q.x2+7&&p.y>=q.y1-7&&p.y<=q.y2+7)return {i,part:'move'};
+function hitObject(p){
+ for(let i=objects.length-1;i>=0;i--){
+  const o=objects[i];if(o.hidden||!o.a)continue;
+  if(Math.hypot(p.x-o.a.x,p.y-o.a.y)<10)return{i,part:'a'};
+  if(o.b&&Math.hypot(p.x-o.b.x,p.y-o.b.y)<10)return{i,part:'b'};
+  if(o.b){
+   let minx=Math.min(o.a.x,o.b.x)-7,maxx=Math.max(o.a.x,o.b.x)+7,miny=Math.min(o.a.y,o.b.y)-7,maxy=Math.max(o.a.y,o.b.y)+7;
+   if(p.x>=minx&&p.x<=maxx&&p.y>=miny&&p.y<=maxy)return{i,part:'move'}
+  }
+  if(o.type==='hline'||o.type==='hray'||o.type==='price'){
+   if(Math.abs(p.y-o.a.y)<8)return{i,part:'move'}
+  }
+  if(o.type==='vline'&&Math.abs(p.x-o.a.x)<8)return{i,part:'move'}
  }
  return null
 }
-function showSelection(){
- const ot=document.getElementById('objectToolbar'),o=objects[selected];
- if(selected<0||!o){ot.classList.remove('show');return}
- let q=objectBounds(o),x=Math.min(q.x1,q.x2),y=Math.min(q.y1,q.y2);
- ot.style.left=Math.max(4,Math.min(S.clientWidth-300,x))+'px';ot.style.top=Math.max(4,y-42)+'px';ot.classList.add('show');
+function setSelected(i){
+ selected=i;
+ const el=document.getElementById('selection');
+ if(i<0||!objects[i]){el.classList.remove('show');return}
+ let o=objects[i],x=o.a.x,y=o.a.y;
+ el.style.left=Math.max(5,Math.min(stage.clientWidth-300,x))+'px';el.style.top=Math.max(5,y-42)+'px';el.classList.add('show')
 }
-function selectionDraw(){
- if(selected<0||!objects[selected]||objects[selected].hidden)return;
- const o=objects[selected],q=objectBounds(o);if(!q)return;
- X.save();X.strokeStyle='#f0b90b';X.setLineDash([4,3]);X.strokeRect(q.x1-5,q.y1-5,Math.max(10,q.x2-q.x1+10),Math.max(10,q.y2-q.y1+10));X.setLineDash([]);
- [o.a,o.b].forEach(p=>{if(!p)return;X.fillStyle='#181a20';X.strokeStyle='#f0b90b';X.beginPath();X.arc(p.x,p.y,5,0,Math.PI*2);X.fill();X.stroke()});X.restore();showSelection();
+function draw(){
+ const w=stage.clientWidth,h=stage.clientHeight;ctx.clearRect(0,0,w,h);ctx.fillStyle='#0b0e11';ctx.fillRect(0,0,w,h);
+ const g=geometry();if(!g.v.length){ctx.fillStyle='#848e9c';ctx.font='14px Arial';ctx.fillText('Connecting to Binance...',20,30);return}
+ ctx.strokeStyle='#1c2026';ctx.lineWidth=1;
+ for(let i=0;i<7;i++){let y=g.h*i/6;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(g.w,y);ctx.stroke()}
+ g.v.forEach((b,i)=>{
+  let x=(i+.5)*g.gap,yo=yFromPrice(b.open,g),yc=yFromPrice(b.close,g),yh=yFromPrice(b.high,g),yl=yFromPrice(b.low,g),up=b.close>=b.open;
+  ctx.strokeStyle=up?'#0ecb81':'#f6465d';ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.moveTo(x,yh);ctx.lineTo(x,yl);ctx.stroke();ctx.fillRect(x-g.gap*.3,Math.min(yo,yc),Math.max(2,g.gap*.6),Math.max(1,Math.abs(yc-yo)))
+ })
+ objects.forEach((o,i)=>{if(!o.hidden)render(o,g,i===selected)})
+ drawAxis(g);drawTime(g)
 }
-const oldDraw=draw;
-draw=function(){oldDraw();objects.forEach((o,i)=>{if(o.hidden)return});selectionDraw()};
-S.addEventListener('mousemove',e=>{
- const r=S.getBoundingClientRect(),p={x:e.clientX-r.left,y:e.clientY-r.top};
- const cx=document.getElementById('crossX'),cy=document.getElementById('crossY');
- if(mode==='cross'){cx.style.display='block';cy.style.display='block';cx.style.top=p.y+'px';cy.style.left=p.x+'px'}else{cx.style.display='none';cy.style.display='none'}
- if(drag)return;
- const hit=hitTest(p);hover=hit?hit.i:-1;
-});
-S.addEventListener('pointerdown',e=>{
- if(locked)return;
- let r=S.getBoundingClientRect(),p={x:e.clientX-r.left,y:e.clientY-r.top},G=bars.length?geom():null,strong=e.ctrlKey||e.metaKey;
- if(G)p=snapPoint(p,G,strong);
- let hit=hitTest(p);
- if(mode==='cross' || (hit && !['eraser','dot','text','note','label','hline','hray','vline','crossline','price'].includes(mode))){
-   if(hit&&objects[hit.i]&&!objects[hit.i].locked){selected=hit.i;editPart=hit.part;let o=objects[selected];drag={edit:true,base:{x:p.x,y:p.y},a:{...o.a},b:o.b?{...o.b}:null};showSelection();draw();S.setPointerCapture(e.pointerId);return}
-   selected=-1;editPart=null;drag={pan:true,x:p.x};S.setPointerCapture(e.pointerId);return;
+function render(o,g,isSelected){
+ ctx.save();ctx.lineWidth=o.width||1.5;ctx.strokeStyle=o.color||'#f0b90b';
+ let alpha=(o.opacity==null?12:o.opacity)/100;ctx.fillStyle=hexToRgba(o.color||'#f0b90b',alpha);
+ const a=o.a,b=o.b;
+ if(o.type==='hline'||o.type==='hray'||o.type==='price'){ctx.beginPath();ctx.moveTo(0,a.y);ctx.lineTo(g.w,a.y);ctx.stroke()}
+ else if(o.type==='vline'){ctx.beginPath();ctx.moveTo(a.x,0);ctx.lineTo(a.x,g.h);ctx.stroke()}
+ else if(o.type==='crossline'){ctx.beginPath();ctx.moveTo(0,a.y);ctx.lineTo(g.w,a.y);ctx.moveTo(a.x,0);ctx.lineTo(a.x,g.h);ctx.stroke()}
+ else if(o.type==='trend'||o.type==='ray'||o.type==='extended'||o.type==='channel'){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();if(o.type==='channel'){let dy=25;ctx.beginPath();ctx.moveTo(a.x,a.y+dy);ctx.lineTo(b.x,b.y+dy);ctx.stroke()}}
+ else if(o.type==='rect'){ctx.fillRect(a.x,a.y,b.x-a.x,b.y-a.y);ctx.strokeRect(a.x,a.y,b.x-a.x,b.y-a.y)}
+ else if(o.type==='circle'||o.type==='ellipse'){let rx=Math.abs(b.x-a.x)/2,ry=o.type==='circle'?rx:Math.abs(b.y-a.y)/2;ctx.beginPath();ctx.ellipse((a.x+b.x)/2,(a.y+b.y)/2,rx,ry,0,0,Math.PI*2);ctx.stroke()}
+ else if(o.type==='triangle'){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,a.y);ctx.lineTo((a.x+b.x)/2,b.y);ctx.closePath();ctx.stroke()}
+ else if(o.type==='fib'){let lv=[0,.236,.382,.5,.618,.786,1,1.272,1.618,2.618];lv.forEach(v=>{let y=a.y+(b.y-a.y)*v;ctx.beginPath();ctx.moveTo(Math.min(a.x,b.x),y);ctx.lineTo(Math.max(a.x,b.x),y);ctx.stroke();ctx.fillStyle=o.color||'#f0b90b';ctx.font='10px Arial';ctx.fillText((v*100).toFixed(1)+'%',Math.min(a.x,b.x)+4,y-3)})}
+ else if(o.type==='fibext'){let lv=[0,.618,1,1.272,1.618,2.618];lv.forEach(v=>{let y=a.y+(b.y-a.y)*v;ctx.beginPath();ctx.moveTo(Math.min(a.x,b.x),y);ctx.lineTo(Math.max(a.x,b.x),y);ctx.stroke()})}
+ else if(o.type==='text'){ctx.fillStyle=o.color||'#f0b90b';ctx.font='14px Arial';ctx.fillText(o.text||'Text',a.x,a.y)}
+ else if(o.type==='dot'){ctx.fillStyle=o.color||'#f0b90b';ctx.beginPath();ctx.arc(a.x,a.y,4,0,Math.PI*2);ctx.fill()}
+ else if(o.type==='arrow'){drawArrow(a,b,o.color||'#f0b90b')}
+ if(isSelected&&o.b){
+  ctx.setLineDash([4,3]);ctx.strokeStyle='#f0b90b';ctx.strokeRect(Math.min(a.x,b.x)-5,Math.min(a.y,b.y)-5,Math.abs(b.x-a.x)+10,Math.abs(b.y-a.y)+10);ctx.setLineDash([]);
+  [a,b].forEach(p=>{ctx.fillStyle='#181a20';ctx.strokeStyle='#f0b90b';ctx.beginPath();ctx.arc(p.x,p.y,5,0,Math.PI*2);ctx.fill();ctx.stroke()})
  }
- if(['eraser'].includes(mode)){if(hit){history.push(objects.splice(hit.i,1)[0]);future=[];selected=-1;save();draw()}return}
- if(['dot','text','note','label','hline','hray','vline','crossline','price'].includes(mode)){
-   objects.push({type:mode,a:p,text:mode==='label'?'Price label':mode==='note'?'Note':'Text',color:'#f0b90b',width:1.5});selected=objects.length-1;save();draw();return
- }
- drag={drawing:true,a:p};S.setPointerCapture(e.pointerId)
+ ctx.restore()
+}
+function drawArrow(a,b,c){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();let ang=Math.atan2(b.y-a.y,b.x-a.x),s=10;ctx.beginPath();ctx.moveTo(b.x,b.y);ctx.lineTo(b.x-s*Math.cos(ang-.5),b.y-s*Math.sin(ang-.5));ctx.lineTo(b.x-s*Math.cos(ang+.5),b.y-s*Math.sin(ang+.5));ctx.closePath();ctx.fillStyle=c;ctx.fill()}
+function hexToRgba(hex,a){let h=hex.replace('#','');if(h.length===3)h=h.split('').map(x=>x+x).join('');let n=parseInt(h,16);return`rgba(${n>>16&255},${n>>8&255},${n&255},${a})`}
+function drawAxis(g){let el=document.getElementById('axis');el.innerHTML='';for(let i=0;i<7;i++){let s=document.createElement('span');s.style.top=(g.h*i/6)+'px';s.textContent=fmt(g.max-(g.max-g.min)*i/6);el.appendChild(s)}}
+function drawTime(g){let el=document.getElementById('time');el.innerHTML='';for(let i=0;i<6;i++){let j=Math.floor((g.n-1)*i/5),s=document.createElement('span');s.style.left=((j+.5)*g.gap)+'px';s.textContent=new Date(g.v[j].time).toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});el.appendChild(s)}}
+function activate(t){mode=t;document.querySelectorAll('.tool').forEach(x=>x.classList.remove('active'));let b=document.querySelector(`[data-tool="${t}"]`);if(b)b.classList.add('active');document.getElementById('menu').classList.remove('show')}
+function menu(name){
+ const m=document.getElementById('menu');m.innerHTML='<h4>'+name.toUpperCase()+'</h4>'+toolMenus[name].map(x=>`<div class="mi" data-pick="${x[2]}"><i>${x[0]}</i><b>${x[1]}</b><em>☆</em></div>`).join('');m.classList.toggle('show');m.querySelectorAll('.mi').forEach(x=>x.onclick=()=>activate(x.dataset.pick))
+}
+function pushUndo(){undoStack.push(JSON.stringify(objects));if(undoStack.length>50)undoStack.shift();redoStack=[]}
+function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(objects));objects=JSON.parse(undoStack.pop());save();draw()}
+function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(objects));objects=JSON.parse(redoStack.pop());save();draw()}
+
+document.querySelectorAll('.tool').forEach(b=>b.onclick=()=>{
+ if(b.dataset.menu)return menu(b.dataset.menu);
+ let t=b.dataset.tool;
+ if(t==='zoomIn'){visible=Math.max(20,visible-12);draw();return}
+ if(t==='zoomOut'){visible=Math.min(300,visible+12);draw();return}
+ if(t==='reset'){visible=90;offset=0;draw();return}
+ if(t==='magnet'){magnetMode=!magnetMode;b.classList.toggle('active',magnetMode);return}
+ if(t==='eraser'){activate('eraser');return}
+ activate(t)
 });
-S.addEventListener('pointermove',e=>{
+document.getElementById('magnet').title='Magnet: click to toggle; hold Ctrl/Cmd while drawing for strong magnet';
+document.getElementById('deleteObject').onclick=()=>{if(selected>=0){pushUndo();objects.splice(selected,1);selected=-1;document.getElementById('selection').classList.remove('show');save();draw()}}
+document.getElementById('cloneObject').onclick=()=>{if(selected>=0){pushUndo();let o=JSON.parse(JSON.stringify(objects[selected]));o.a.x+=15;o.a.y+=15;if(o.b){o.b.x+=15;o.b.y+=15}objects.push(o);selected=objects.length-1;save();draw()}}
+document.getElementById('lockObject').onclick=()=>{if(selected>=0){objects[selected].locked=!objects[selected].locked;save();draw()}}
+document.getElementById('settingsObject').onclick=()=>document.getElementById('settings').classList.toggle('show')
+document.getElementById('settingsBtn').onclick=()=>document.getElementById('settings').classList.toggle('show')
+document.getElementById('color').oninput=e=>{if(selected>=0){objects[selected].color=e.target.value;save();draw()}}
+document.getElementById('width').onchange=e=>{if(selected>=0){objects[selected].width=+e.target.value;save();draw()}}
+document.getElementById('opacity').oninput=e=>{if(selected>=0){objects[selected].opacity=+e.target.value;save();draw()}}
+document.getElementById('clear').onclick=()=>{if(objects.length&&confirm('Delete all drawings?')){pushUndo();objects=[];selected=-1;save();draw()}}
+document.getElementById('hideWatch').onclick=()=>document.getElementById('watch').classList.toggle('hide')
+document.getElementById('hideRight').onclick=()=>document.getElementById('right').classList.toggle('hide')
+document.getElementById('hideTools').onclick=()=>document.getElementById('toolbar').classList.toggle('hide')
+document.getElementById('fullscreen').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()
+
+stage.addEventListener('pointerdown',e=>{
+ if(lockedAll)return;
+ const g=geometry(),strong=e.ctrlKey||e.metaKey,p=pointFromEvent(e,g,strong),hit=hitObject(p);
+ if(mode==='cursor'){
+  if(hit&&objects[hit.i]&&!objects[hit.i].locked){
+   selected=hit.i;setSelected(selected);drag={kind:'edit',part:hit.part,start:p,a:{...objects[hit.i].a},b:objects[hit.i].b?{...objects[hit.i].b}:null};stage.setPointerCapture(e.pointerId);draw();return
+  }
+  selected=-1;setSelected(-1);drag={kind:'pan',x:e.clientX};stage.setPointerCapture(e.pointerId);return
+ }
+ if(mode==='eraser'){if(hit){pushUndo();objects.splice(hit.i,1);selected=-1;setSelected(-1);save();draw()}return}
+ if(['hline','hray','vline','crossline','price','dot'].includes(mode)){
+  pushUndo();objects.push({type:mode,a:p,color:'#f0b90b',width:1.5});selected=objects.length-1;setSelected(selected);save();draw();return
+ }
+ if(mode==='text'){let text=prompt('Enter text:','Text');if(text!==null){pushUndo();objects.push({type:'text',a:p,text,color:'#f0b90b',width:1.5});selected=objects.length-1;save();draw()}return}
+ drag={kind:'new',start:p};stage.setPointerCapture(e.pointerId)
+});
+stage.addEventListener('pointermove',e=>{
+ const g=geometry(),p=pointFromEvent(e,g,e.ctrlKey||e.metaKey);
+ const cx=document.getElementById('crossx'),cy=document.getElementById('crossy');
+ if(mode==='cursor'){cx.style.display='block';cy.style.display='block';cx.style.top=p.y+'px';cy.style.left=p.x+'px'}else{cx.style.display='none';cy.style.display='none'}
  if(!drag)return;
- let r=S.getBoundingClientRect(),p={x:e.clientX-r.left,y:e.clientY-r.top},G=bars.length?geom():null;
- if(G)p=snapPoint(p,G,e.ctrlKey||e.metaKey);
- if(drag.pan){offset=Math.max(0,Math.min(Math.max(0,bars.length-visible),offset+Math.round((drag.x-p.x)/12)));drag.x=p.x;draw();return}
- if(drag.edit){let o=objects[selected],dx=p.x-drag.base.x,dy=p.y-drag.base.y;
-   if(editPart==='a')o.a={x:drag.a.x+dx,y:drag.a.y+dy};
-   else if(editPart==='b'&&o.b)o.b={x:drag.b.x+dx,y:drag.b.y+dy};
-   else {o.a={x:drag.a.x+dx,y:drag.a.y+dy};if(o.b)o.b={x:drag.b.x+dx,y:drag.b.y+dy}}
-   draw();return
+ if(drag.kind==='pan'){offset=Math.max(0,Math.min(Math.max(0,bars.length-visible),offset+Math.round((drag.x-e.clientX)/10)));drag.x=e.clientX;draw();return}
+ if(drag.kind==='edit'){
+  let o=objects[selected],dx=p.x-drag.start.x,dy=p.y-drag.start.y;
+  if(drag.part==='a')o.a={x:drag.a.x+dx,y:drag.a.y+dy};
+  else if(drag.part==='b'&&o.b)o.b={x:drag.b.x+dx,y:drag.b.y+dy};
+  else{o.a={x:drag.a.x+dx,y:drag.a.y+dy};if(o.b)o.b={x:drag.b.x+dx,y:drag.b.y+dy}}
+  draw();return
  }
+ if(drag.kind==='new'){draw();render({type:mode,a:drag.start,b:p,color:'#f0b90b',width:1.5},g,false)}
 });
-S.addEventListener('pointerup',e=>{
- if(!drag)return;
- let r=S.getBoundingClientRect(),p={x:e.clientX-r.left,y:e.clientY-r.top},G=bars.length?geom():null;
- if(G)p=snapPoint(p,G,e.ctrlKey||e.metaKey);
- if(drag.drawing){objects.push({type:mode,a:drag.a,b:p,color:'#f0b90b',width:1.5});selected=objects.length-1;save();draw()}
- if(drag.edit){save();draw()}
- drag=null;editPart=null
+stage.addEventListener('pointerup',e=>{
+ if(!drag)return;const g=geometry(),p=pointFromEvent(e,g,e.ctrlKey||e.metaKey);
+ if(drag.kind==='edit'){save();draw()}
+ else if(drag.kind==='new'){
+  pushUndo();let a=drag.start,b=p;objects.push({type:mode,a,b,color:'#f0b90b',width:1.5,opacity:12});selected=objects.length-1;setSelected(selected);save();draw()
+ }
+ drag=null
 });
-S.addEventListener('contextmenu',e=>{
- e.preventDefault();let r=S.getBoundingClientRect(),p={x:e.clientX-r.left,y:e.clientY-r.top},hit=hitTest(p);
- if(hit){selected=hit.i;showSelection();draw();document.getElementById('settingsPanel').classList.add('show')}
-});
+stage.addEventListener('contextmenu',e=>{e.preventDefault();const g=geometry(),p=pointFromEvent(e,g,false),hit=hitObject(p);if(hit){selected=hit.i;setSelected(selected);document.getElementById('settings').classList.add('show');draw()}})
 document.addEventListener('keydown',e=>{
- if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='z'){e.preventDefault();if(objects.length){future.push(objects.pop());save();draw()}}
- if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='y'){e.preventDefault();if(future.length){objects.push(future.pop());save();draw()}}
- if(e.key==='Delete'||e.key==='Backspace'){if(selected>=0){history.push(objects.splice(selected,1)[0]);selected=-1;save();draw()}}
- if(e.key==='Escape'){document.getElementById('menu').classList.remove('open');document.getElementById('settingsPanel').classList.remove('show');selected=-1;draw()}
+ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();undo()}
+ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo()}
+ if((e.key==='Delete'||e.key==='Backspace')&&selected>=0){pushUndo();objects.splice(selected,1);selected=-1;setSelected(-1);save();draw()}
+ if(e.key==='Escape'){document.getElementById('menu').classList.remove('show');document.getElementById('settings').classList.remove('show');setSelected(-1);draw()}
 });
-document.getElementById('objDelete').onclick=()=>{if(selected>=0){objects.splice(selected,1);selected=-1;save();draw()}};
-document.getElementById('objClone').onclick=()=>{if(selected>=0){let o=JSON.parse(JSON.stringify(objects[selected]));o.a.x+=15;o.a.y+=15;if(o.b){o.b.x+=15;o.b.y+=15}objects.push(o);selected=objects.length-1;save();draw()}};
-document.getElementById('objLock').onclick=()=>{if(selected>=0){objects[selected].locked=!objects[selected].locked;save();draw()}};
-document.getElementById('objHide').onclick=()=>{if(selected>=0){objects[selected].hidden=!objects[selected].hidden;save();draw()}};
-document.getElementById('settings').onclick=()=>document.getElementById('settingsPanel').classList.toggle('show');
-document.getElementById('lineWidth').onchange=e=>{if(selected>=0){objects[selected].width=+e.target.value;save();draw()}};
-document.getElementById('lineColor').onchange=e=>{if(selected>=0){objects[selected].color=e.target.value;save();draw()}};
-document.getElementById('fillOpacity').oninput=e=>{if(selected>=0){objects[selected].opacity=+e.target.value;save();draw()}};
-document.getElementById('clear').onclick=()=>{if(confirm('Delete all drawings on this chart?')){objects=[];selected=-1;save();draw()}};
-document.getElementById('hideWatch').onclick=()=>document.getElementById('watch').classList.toggle('hidden');
-document.getElementById('hideRight').onclick=()=>document.getElementById('right').classList.toggle('hidden');
-document.getElementById('hideTools').onclick=()=>document.getElementById('tools').classList.toggle('hidden');
-document.getElementById('full').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
-document.querySelectorAll('.coin').forEach(c=>c.onclick=()=>{sym=c.dataset.s;document.querySelectorAll('.coin').forEach(x=>x.classList.remove('active'));c.classList.add('active');document.getElementById('pair').textContent=sym.replace('USDT','/USDT');connect()});
-document.querySelectorAll('.tf button').forEach(b=>b.onclick=()=>{tf=b.dataset.t;document.querySelectorAll('.tf button').forEach(x=>x.classList.remove('active'));b.classList.add('active');connect()});
-document.getElementById('search').oninput=e=>{let q=e.target.value.toUpperCase();document.querySelectorAll('.coin').forEach(c=>c.style.display=c.innerText.includes(q)?'flex':'none')};
-setInterval(()=>{let p=parseFloat((document.getElementById('live').textContent||'').replace(/,/g,''));if(!p)return;let A='',B='';for(let i=1;i<=7;i++){let a=p*(1+i*.0001),b=p*(1-i*.0001);A+=`<div class="row"><span class="ask">${fmt(a)}</span><span>${(Math.random()*2).toFixed(4)}</span><span>${(Math.random()*50000).toFixed(2)}</span></div>`;B+=`<div class="row"><span class="bid">${fmt(b)}</span><span>${(Math.random()*2).toFixed(4)}</span><span>${(Math.random()*50000).toFixed(2)}</span></div>`}document.getElementById('asks').innerHTML=A;document.getElementById('bids').innerHTML=B},1000);
+stage.addEventListener('wheel',e=>{e.preventDefault();let old=visible;visible=Math.max(20,Math.min(300,visible+(e.deltaY>0?10:-10)));let r=stage.getBoundingClientRect(),ratio=(e.clientX-r.left)/(stage.clientWidth-78);let center=offset+old*ratio;offset=Math.max(0,Math.min(Math.max(0,bars.length-visible),Math.round(center-visible*ratio)));draw()},{passive:false});
+
+async function connect(){
+ if(ws)try{ws.close()}catch(e){}
+ bars=[];load();draw();
+ try{
+  let res=await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=500`),data=await res.json();
+  bars=data.map(k=>({time:+k[0],open:+k[1],high:+k[2],low:+k[3],close:+k[4]}));
+  offset=0;draw()
+ }catch(e){}
+ ws=new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`);
+ ws.onmessage=e=>{let k=JSON.parse(e.data).k;if(!k)return;let b={time:+k.t,open:+k.o,high:+k.h,low:+k.l,close:+k.c},last=bars[bars.length-1];if(last&&last.time===b.time)bars[bars.length-1]=b;else bars.push(b);if(bars.length>500)bars.shift();document.getElementById('live').textContent=fmt(b.close);let q=document.getElementById('price-'+symbol);if(q)q.textContent=fmt(b.close);draw()}
+}
+document.querySelectorAll('.coin').forEach(c=>c.onclick=()=>{symbol=c.dataset.symbol;document.querySelectorAll('.coin').forEach(x=>x.classList.remove('active'));c.classList.add('active');document.getElementById('pair').textContent=symbol.replace('USDT','/USDT');connect()})
+document.querySelectorAll('.tf button').forEach(b=>b.onclick=()=>{interval=b.dataset.tf;document.querySelectorAll('.tf button').forEach(x=>x.classList.remove('active'));b.classList.add('active');connect()})
+document.getElementById('search').oninput=e=>{let q=e.target.value.toUpperCase();document.querySelectorAll('.coin').forEach(c=>c.style.display=c.innerText.toUpperCase().includes(q)?'flex':'none')}
+window.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){}});
 resize();connect();
 </script>
 </body>
