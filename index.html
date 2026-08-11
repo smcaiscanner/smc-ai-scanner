@@ -1,148 +1,864 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>SMC AI Scanner</title>
+
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b0e11;font-family:Arial,Helvetica,sans-serif}
-#top{
- height:52px;background:#181a20;border-bottom:1px solid #2b2f36;
- display:flex;align-items:center;gap:7px;padding:0 12px;color:#eaecef
+* {
+    box-sizing: border-box;
 }
-.logo{font-size:18px;font-weight:700;color:#f0b90b;margin-right:8px}
-input{width:165px;background:#0b0e11;color:#fff;border:1px solid #3b4048;border-radius:4px;padding:7px 9px}
-button{
- background:#2b2f36;color:#eaecef;border:1px solid #3b4048;
- border-radius:4px;padding:7px 10px;cursor:pointer
+
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #0b0e11;
+    color: #eaecef;
+    font-family: Arial, Helvetica, sans-serif;
 }
-button:hover{border-color:#f0b90b;color:#f0b90b}
-.swatch{width:28px;height:28px;padding:2px;border-radius:50%;cursor:pointer;border:1px solid #555}
-#chart{position:absolute;top:52px;left:0;right:0;bottom:0}
-.tip{margin-left:auto;color:#848e9c;font-size:11px}
+
+/* TOP BAR */
+
+#top {
+    height: 52px;
+    background: #181a20;
+    border-bottom: 1px solid #2b2f36;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 12px;
+}
+
+.logo {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f0b90b;
+    margin-right: 8px;
+}
+
+input {
+    background: #0b0e11;
+    color: white;
+    border: 1px solid #3b4048;
+    border-radius: 4px;
+    padding: 7px 9px;
+}
+
+#symbol {
+    width: 170px;
+}
+
+button {
+    background: #2b2f36;
+    color: #eaecef;
+    border: 1px solid #3b4048;
+    border-radius: 4px;
+    padding: 7px 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    border-color: #f0b90b;
+    color: #f0b90b;
+}
+
+#aiBtn {
+    background: #f0b90b;
+    color: #111;
+    font-weight: 700;
+}
+
+.tip {
+    margin-left: auto;
+    color: #848e9c;
+    font-size: 11px;
+}
+
+/* CHART */
+
+#chart {
+    position: absolute;
+    top: 52px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* AI PANEL */
+
+#aiPanel {
+    position: fixed;
+    z-index: 100;
+    right: 14px;
+    top: 65px;
+
+    width: 380px;
+    height: calc(100vh - 80px);
+
+    background: #161a1e;
+    border: 1px solid #30353d;
+    border-radius: 8px;
+
+    box-shadow: 0 12px 40px #0009;
+
+    display: none;
+}
+
+#aiHead {
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 12px;
+
+    border-bottom: 1px solid #30353d;
+}
+
+#aiHead strong {
+    color: #f0b90b;
+    font-size: 16px;
+}
+
+#closeAI {
+    margin-left: auto;
+    background: transparent;
+    border: 0;
+    font-size: 22px;
+}
+
+/* MESSAGES */
+
+#messages {
+    height: calc(100% - 137px);
+
+    overflow-y: auto;
+
+    padding: 12px;
+}
+
+.msg {
+    padding: 10px 12px;
+
+    margin-bottom: 9px;
+
+    border-radius: 7px;
+
+    font-size: 13px;
+
+    line-height: 1.45;
+
+    white-space: pre-wrap;
+}
+
+.msg.ai {
+    background: #1e2329;
+
+    border-left: 3px solid #f0b90b;
+}
+
+.msg.user {
+    background: #252a31;
+}
+
+/* AI CONTROLS */
+
+#aiControls {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    padding: 10px;
+
+    border-top: 1px solid #30353d;
+
+    background: #161a1e;
+}
+
+#prompt {
+    width: 100%;
+
+    height: 58px;
+
+    resize: none;
+
+    background: #0b0e11;
+
+    color: white;
+
+    border: 1px solid #3b4048;
+
+    border-radius: 6px;
+
+    padding: 9px;
+
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.aiButtons {
+    display: flex;
+
+    gap: 6px;
+
+    margin-top: 7px;
+}
+
+.aiButtons button {
+    flex: 1;
+}
+
+#teachBtn {
+    background: #20262d;
+}
+
+#status {
+    font-size: 10px;
+
+    color: #848e9c;
+
+    margin-top: 6px;
+}
 </style>
 </head>
+
 <body>
+
+<!-- TOP BAR -->
+
 <div id="top">
- <div class="logo">SMC AI SCANNER</div>
- <input id="symbol" value="BINANCE:BTCUSDT">
- <button onclick="loadSymbol()">Load</button>
- <button onclick="loadSymbol('BINANCE:BTCUSDT')">BTC</button>
- <button onclick="loadSymbol('BINANCE:ETHUSDT')">ETH</button>
- <button onclick="loadSymbol('BINANCE:AVAXUSDT')">AVAX</button>
- <button onclick="loadSymbol('BINANCE:SEIUSDT')">SEI</button>
- <button onclick="resetChart()">Reset</button>
- <button onclick="toggleGrid()">Grid</button>
- <button onclick="toggleCandle()">Candle</button>
- <button class="swatch" title="Dark chart" style="background:#0b0e11" onclick="setChartColor('#0b0e11')"></button>
- <button class="swatch" title="Dark blue chart" style="background:#07111f" onclick="setChartColor('#07111f')"></button>
- <button class="swatch" title="Black chart" style="background:#000000" onclick="setChartColor('#000000')"></button>
- <div class="tip">Right-click chart for TradingView menu • Ctrl/Cmd = magnet</div>
+
+    <div class="logo">
+        SMC AI SCANNER
+    </div>
+
+    <input
+        id="symbol"
+        value="BINANCE:BTCUSDT"
+        placeholder="BINANCE:BTCUSDT"
+    >
+
+    <button onclick="loadSymbol()">
+        Load
+    </button>
+
+    <button onclick="loadSymbol('BINANCE:BTCUSDT')">
+        BTC
+    </button>
+
+    <button onclick="loadSymbol('BINANCE:ETHUSDT')">
+        ETH
+    </button>
+
+    <button onclick="loadSymbol('BINANCE:AVAXUSDT')">
+        AVAX
+    </button>
+
+    <button onclick="loadSymbol('BINANCE:SEIUSDT')">
+        SEI
+    </button>
+
+    <button onclick="loadSymbol('BINANCE:TIAUSDT')">
+        TIA
+    </button>
+
+    <button onclick="loadSymbol('BINANCE:API3USDT')">
+        API3
+    </button>
+
+    <button id="aiBtn" onclick="toggleAI()">
+        🤖 AI SMC
+    </button>
+
+    <div class="tip">
+        Live Binance • TradingView chart • SMC AI
+    </div>
+
 </div>
+
+<!-- CHART -->
+
 <div id="chart"></div>
 
+<!-- AI PANEL -->
+
+<div id="aiPanel">
+
+    <div id="aiHead">
+
+        <strong>
+            🤖 SMC AI
+        </strong>
+
+        <button
+            id="closeAI"
+            onclick="toggleAI()"
+        >
+            ×
+        </button>
+
+    </div>
+
+    <div id="messages">
+
+        <div class="msg ai">
+
+SMC AI is ready.
+
+Ask me about:
+
+• BSL / SSL
+• Liquidity sweep
+• SFP
+• CHoCH / MSS
+• BOS
+• Displacement
+• FVG
+• Order Blocks
+• Premium / Discount
+• Multi-timeframe SMC
+
+You can also teach me your own SMC rules.
+
+        </div>
+
+    </div>
+
+    <div id="aiControls">
+
+        <textarea
+            id="prompt"
+            placeholder="Example: A major swing high is buy-side liquidity. If price sweeps it and closes back below, I call it a valid BSL sweep."
+        ></textarea>
+
+        <div class="aiButtons">
+
+            <button onclick="askAI()">
+                Ask AI
+            </button>
+
+            <button
+                id="teachBtn"
+                onclick="teachAI()"
+            >
+                Teach AI
+            </button>
+
+            <button onclick="analyzeAI()">
+                Analyze
+            </button>
+
+        </div>
+
+        <div id="status">
+            AI: ready
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- TRADINGVIEW -->
+
 <script src="https://s3.tradingview.com/tv.js"></script>
+
 <script>
-let tv=null;
-let grid=true;
-let candleStyle=1;
-let bg='#0b0e11';
 
-function create(symbol){
- tv=new TradingView.widget({
-   autosize:true,
-   symbol:symbol,
-   interval:'15',
-   timezone:'Etc/UTC',
-   theme:'dark',
-   style:'1',
-   locale:'en',
-   toolbar_bg:'#181a20',
-   enable_publishing:false,
-   allow_symbol_change:true,
-   hide_top_toolbar:false,
-   hide_side_toolbar:false,
-   hide_legend:false,
-   save_image:true,
-   withdateranges:true,
-   details:true,
-   hotlist:true,
-   calendar:true,
-   container_id:'chart',
-   enabled_features:['side_toolbar_in_fullscreen_mode'],
-   overrides:{
-     'paneProperties.backgroundType':'solid',
-     'paneProperties.background':bg,
-     'paneProperties.vertGridProperties.color':grid?'#1b2027':'#0b0e11',
-     'paneProperties.horzGridProperties.color':grid?'#1b2027':'#0b0e11',
-     'mainSeriesProperties.style':candleStyle,
-     'mainSeriesProperties.candleStyle.upColor':'#0ecb81',
-     'mainSeriesProperties.candleStyle.downColor':'#f6465d',
-     'mainSeriesProperties.candleStyle.borderUpColor':'#0ecb81',
-     'mainSeriesProperties.candleStyle.borderDownColor':'#f6465d',
-     'mainSeriesProperties.candleStyle.wickUpColor':'#0ecb81',
-     'mainSeriesProperties.candleStyle.wickDownColor':'#f6465d'
-   }
- });
+let chartWidget = null;
+
+let currentSymbol = "BINANCE:BTCUSDT";
+
+let aiHistory = [];
+
+
+/* =========================
+   CREATE CHART
+========================= */
+
+function createChart(symbol) {
+
+    chartWidget = new TradingView.widget({
+
+        autosize: true,
+
+        symbol: symbol,
+
+        interval: "15",
+
+        timezone: "Etc/UTC",
+
+        theme: "dark",
+
+        style: "1",
+
+        locale: "en",
+
+        toolbar_bg: "#181a20",
+
+        enable_publishing: false,
+
+        allow_symbol_change: true,
+
+        hide_top_toolbar: false,
+
+        hide_side_toolbar: false,
+
+        hide_legend: false,
+
+        save_image: true,
+
+        withdateranges: true,
+
+        details: true,
+
+        hotlist: true,
+
+        calendar: true,
+
+        container_id: "chart",
+
+        enabled_features: [
+            "side_toolbar_in_fullscreen_mode"
+        ],
+
+        overrides: {
+
+            "paneProperties.backgroundType":
+                "solid",
+
+            "paneProperties.background":
+                "#0b0e11",
+
+            "paneProperties.vertGridProperties.color":
+                "#1b2027",
+
+            "paneProperties.horzGridProperties.color":
+                "#1b2027",
+
+            "mainSeriesProperties.candleStyle.upColor":
+                "#0ecb81",
+
+            "mainSeriesProperties.candleStyle.downColor":
+                "#f6465d",
+
+            "mainSeriesProperties.candleStyle.borderUpColor":
+                "#0ecb81",
+
+            "mainSeriesProperties.candleStyle.borderDownColor":
+                "#f6465d",
+
+            "mainSeriesProperties.candleStyle.wickUpColor":
+                "#0ecb81",
+
+            "mainSeriesProperties.candleStyle.wickDownColor":
+                "#f6465d"
+        }
+
+    });
+
 }
 
-function loadSymbol(s){
- const value=(s||document.getElementById('symbol').value).trim().toUpperCase();
- document.getElementById('symbol').value=value;
- if(tv && tv.setSymbol){tv.setSymbol(value,'15');}
- else create(value);
+
+/* =========================
+   CHANGE SYMBOL
+========================= */
+
+function loadSymbol(symbol) {
+
+    currentSymbol =
+        (
+            symbol ||
+            document.getElementById("symbol").value
+        )
+        .trim()
+        .toUpperCase();
+
+    document.getElementById("symbol").value =
+        currentSymbol;
+
+    if (
+        chartWidget &&
+        chartWidget.setSymbol
+    ) {
+
+        chartWidget.setSymbol(
+            currentSymbol,
+            "15"
+        );
+
+    } else {
+
+        createChart(currentSymbol);
+
+    }
+
 }
 
-function resetChart(){
- if(!tv)return;
- try{
-   if(tv.chart && tv.chart().resetData){tv.chart().resetData();}
-   if(tv.activeChart && tv.activeChart().resetData){tv.activeChart().resetData();}
- }catch(e){}
- /* Public widget does not expose the full Advanced Charts reset-view API.
-    Reloading the widget gives a clean view while preserving the symbol. */
- const s=document.getElementById('symbol').value;
- document.getElementById('chart').innerHTML='';
- create(s);
+
+/* =========================
+   AI PANEL
+========================= */
+
+function toggleAI() {
+
+    const panel =
+        document.getElementById("aiPanel");
+
+    if (
+        panel.style.display === "none" ||
+        panel.style.display === ""
+    ) {
+
+        panel.style.display = "block";
+
+    } else {
+
+        panel.style.display = "none";
+
+    }
+
 }
 
-function setChartColor(color){
- bg=color;
- if(!tv)return;
- try{
-   if(tv.applyOverrides){
-     tv.applyOverrides({
-       'paneProperties.backgroundType':'solid',
-       'paneProperties.background':color,
-       'paneProperties.vertGridProperties.color':grid?'#1b2027':color,
-       'paneProperties.horzGridProperties.color':grid?'#1b2027':color
-     });
-   }
- }catch(e){
-   const s=document.getElementById('symbol').value;
-   document.getElementById('chart').innerHTML='';
-   create(s);
- }
+
+/* =========================
+   ADD MESSAGE
+========================= */
+
+function addMessage(
+    text,
+    type
+) {
+
+    const messages =
+        document.getElementById("messages");
+
+    const div =
+        document.createElement("div");
+
+    div.className =
+        "msg " + type;
+
+    div.textContent =
+        text;
+
+    messages.appendChild(div);
+
+    messages.scrollTop =
+        messages.scrollHeight;
+
 }
 
-function toggleGrid(){
- grid=!grid;
- setChartColor(bg);
+
+/* =========================
+   CALL AI BACKEND
+========================= */
+
+async function sendAI(
+    message,
+    mode
+) {
+
+    const status =
+        document.getElementById("status");
+
+    status.textContent =
+        "AI is thinking...";
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/ai",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            message:
+                                message,
+
+                            mode:
+                                mode,
+
+                            symbol:
+                                currentSymbol,
+
+                            timeframe:
+                                "15m",
+
+                            history:
+                                aiHistory
+                                    .slice(-10)
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                "AI request failed"
+            );
+
+        }
+
+
+        const answer =
+            data.answer ||
+            "No answer returned.";
+
+
+        addMessage(
+            answer,
+            "ai"
+        );
+
+
+        aiHistory.push(
+
+            {
+                role: "user",
+                content: message
+            },
+
+            {
+                role: "assistant",
+                content: answer
+            }
+
+        );
+
+
+        status.textContent =
+            "AI: ready";
+
+
+    } catch (error) {
+
+        addMessage(
+
+            "AI connection error:\n\n" +
+            error.message +
+            "\n\n" +
+            "Make sure Cloudflare Workers AI " +
+            "binding named AI is enabled.",
+
+            "ai"
+
+        );
+
+        status.textContent =
+            "AI: error";
+
+    }
+
 }
 
-function toggleCandle(){
- candleStyle=candleStyle===1?3:1;
- try{
-   tv.applyOverrides({'mainSeriesProperties.style':candleStyle});
- }catch(e){}
+
+/* =========================
+   ASK AI
+========================= */
+
+function askAI() {
+
+    const input =
+        document.getElementById("prompt");
+
+    const message =
+        input.value.trim();
+
+
+    if (!message)
+        return;
+
+
+    addMessage(
+        message,
+        "user"
+    );
+
+
+    input.value = "";
+
+
+    sendAI(
+        message,
+        "chat"
+    );
+
 }
 
-document.getElementById('symbol').addEventListener('keydown',e=>{
- if(e.key==='Enter')loadSymbol();
-});
 
-create('BINANCE:BTCUSDT');
+/* =========================
+   TEACH AI
+========================= */
+
+function teachAI() {
+
+    const input =
+        document.getElementById("prompt");
+
+    const lesson =
+        input.value.trim();
+
+
+    if (!lesson) {
+
+        input.focus();
+
+        return;
+
+    }
+
+
+    const message =
+
+`I am teaching you my SMC methodology.
+
+Treat the following as a labeled example/rule from my methodology:
+
+${lesson}
+
+Convert this into:
+
+1. Concept name.
+2. Objective conditions a scanner can detect.
+3. Confirmation conditions.
+4. Invalidation conditions.
+5. Required OHLCV/chart data.
+6. A concise rule suitable for automated SMC scanning.
+
+Do not invent rules that I did not provide.`;
+
+
+    addMessage(
+        "TEACH AI:\n\n" +
+        lesson,
+        "user"
+    );
+
+
+    input.value = "";
+
+
+    sendAI(
+        message,
+        "teach"
+    );
+
+}
+
+
+/* =========================
+   ANALYZE
+========================= */
+
+function analyzeAI() {
+
+    const message =
+
+`Analyze ${currentSymbol} on the 15m timeframe using my SMC methodology.
+
+Validate:
+
+• Liquidity sweep
+• Displacement
+• CHoCH / MSS
+• BOS
+• FVG
+• Order Block
+
+Important:
+You do not have direct access to the chart candles through this request.
+
+Do not invent current price or candle data.
+
+Tell me exactly what market/chart data is required for a reliable SMC decision.`;
+
+
+    addMessage(
+        message,
+        "user"
+    );
+
+
+    sendAI(
+        message,
+        "analyze"
+    );
+
+}
+
+
+/* =========================
+   ENTER TO SEND
+========================= */
+
+document
+    .getElementById("symbol")
+    .addEventListener(
+        "keydown",
+        function(e) {
+
+            if (e.key === "Enter") {
+
+                loadSymbol();
+
+            }
+
+        }
+    );
+
+
+document
+    .getElementById("prompt")
+    .addEventListener(
+        "keydown",
+        function(e) {
+
+            if (
+                e.key === "Enter" &&
+                !e.shiftKey
+            ) {
+
+                e.preventDefault();
+
+                askAI();
+
+            }
+
+        }
+    );
+
+
+/* =========================
+   START
+========================= */
+
+createChart(
+    currentSymbol
+);
+
 </script>
+
 </body>
 </html>
