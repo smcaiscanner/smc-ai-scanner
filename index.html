@@ -1,47 +1,51 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SMC AI Scanner — Binance Style Chart</title>
+<title>SMC AI Scanner — Binance Chart</title>
 <style>
-html,body{margin:0;width:100%;height:100%;background:#0b0e11;overflow:hidden}
-#chart{position:fixed;inset:0}
-#bar{position:fixed;z-index:10;top:0;left:0;right:0;height:42px;background:#181a20;border-bottom:1px solid #2b2f36;display:flex;align-items:center;padding:0 12px;gap:10px;color:#eaecef;font:13px Arial}
-#bar b{color:#f0b90b;font-size:16px}
-#bar button{background:#2b2f36;border:1px solid #3b4048;color:#eaecef;border-radius:4px;padding:6px 10px;cursor:pointer}
-#bar button:hover{border-color:#f0b90b;color:#f0b90b}
-#tv{position:absolute;left:0;right:0;top:43px;bottom:0}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#0b0e11;overflow:hidden;font-family:Arial,Helvetica,sans-serif}
+#top{height:52px;background:#181a20;border-bottom:1px solid #2b2f36;display:flex;align-items:center;gap:8px;padding:0 12px;color:#eaecef}
+.logo{color:#f0b90b;font-weight:700;font-size:18px;margin-right:10px;white-space:nowrap}
+button{background:#2b2f36;color:#eaecef;border:1px solid #3b4048;border-radius:4px;padding:6px 10px;cursor:pointer}
+button:hover{border-color:#f0b90b;color:#f0b90b}
+#symbol{width:160px;background:#0b0e11;color:#fff;border:1px solid #3b4048;border-radius:4px;padding:7px 9px}
+#chart{position:absolute;top:53px;left:0;right:0;bottom:0}
+.note{margin-left:auto;color:#848e9c;font-size:11px}
 </style>
 </head>
 <body>
-<div id="bar">
-  <b>SMC AI SCANNER</b>
-  <button onclick="setSymbol('BINANCE:BTCUSDT')">BTC</button>
-  <button onclick="setSymbol('BINANCE:ETHUSDT')">ETH</button>
-  <button onclick="setSymbol('BINANCE:AVAXUSDT')">AVAX</button>
-  <button onclick="setSymbol('BINANCE:SEIUSDT')">SEI</button>
-  <button onclick="setSymbol('BINANCE:TIAUSDT')">TIA</button>
-  <button onclick="setSymbol('BINANCE:API3USDT')">API3</button>
-  <span style="margin-left:auto;color:#848e9c">TradingView chart engine • Binance market</span>
+<div id="top">
+  <div class="logo">SMC AI SCANNER</div>
+  <input id="symbol" value="BINANCE:BTCUSDT" placeholder="BINANCE:BTCUSDT">
+  <button onclick="loadSymbol()">Load</button>
+  <button onclick="loadSymbol('BINANCE:BTCUSDT')">BTC</button>
+  <button onclick="loadSymbol('BINANCE:ETHUSDT')">ETH</button>
+  <button onclick="loadSymbol('BINANCE:AVAXUSDT')">AVAX</button>
+  <button onclick="loadSymbol('BINANCE:SEIUSDT')">SEI</button>
+  <button onclick="loadSymbol('BINANCE:TIAUSDT')">TIA</button>
+  <button onclick="loadSymbol('BINANCE:API3USDT')">API3</button>
+  <div class="note">Live Binance market • TradingView drawing engine</div>
 </div>
-<div id="tv"></div>
+<div id="chart"></div>
 
 <script src="https://s3.tradingview.com/tv.js"></script>
 <script>
-let tv;
+let widget=null;
 
-function setSymbol(symbol){
-  if(tv && tv.setSymbol){
-    tv.setSymbol(symbol, "15");
+function loadSymbol(s){
+  const symbol=s || document.getElementById('symbol').value.trim().toUpperCase();
+  document.getElementById('symbol').value=symbol;
+  if(widget && widget.setSymbol){
+    widget.setSymbol(symbol,"15");
     return;
   }
   create(symbol);
 }
 
 function create(symbol){
-  document.getElementById("tv").innerHTML="";
-  tv = new TradingView.widget({
+  widget=new TradingView.widget({
     autosize:true,
     symbol:symbol,
     interval:"15",
@@ -51,30 +55,26 @@ function create(symbol){
     locale:"en",
     toolbar_bg:"#181a20",
     enable_publishing:false,
+    allow_symbol_change:true,
     hide_top_toolbar:false,
+    hide_side_toolbar:false,
     hide_legend:false,
     save_image:true,
-    container_id:"tv",
     withdateranges:true,
-    hide_side_toolbar:false,
-    allow_symbol_change:true,
     details:true,
     hotlist:true,
     calendar:true,
+    container_id:"chart",
     studies:[],
-    drawings_access:{
-      type:"black",
-      tools:[]
-    },
-    disabled_features:[
-      "header_compare",
-      "header_symbol_search"
-    ],
     enabled_features:[
       "side_toolbar_in_fullscreen_mode"
     ]
   });
 }
+
+document.getElementById('symbol').addEventListener('keydown',e=>{
+  if(e.key==="Enter")loadSymbol();
+});
 
 create("BINANCE:BTCUSDT");
 </script>
