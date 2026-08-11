@@ -1,864 +1,120 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>SMC AI Scanner</title>
-
-<style>
-* {
-    box-sizing: border-box;
-}
-
-html, body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #0b0e11;
-    color: #eaecef;
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-/* TOP BAR */
-
-#top {
-    height: 52px;
-    background: #181a20;
-    border-bottom: 1px solid #2b2f36;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 0 12px;
-}
-
-.logo {
-    font-size: 18px;
-    font-weight: 700;
-    color: #f0b90b;
-    margin-right: 8px;
-}
-
-input {
-    background: #0b0e11;
-    color: white;
-    border: 1px solid #3b4048;
-    border-radius: 4px;
-    padding: 7px 9px;
-}
-
-#symbol {
-    width: 170px;
-}
-
-button {
-    background: #2b2f36;
-    color: #eaecef;
-    border: 1px solid #3b4048;
-    border-radius: 4px;
-    padding: 7px 10px;
-    cursor: pointer;
-}
-
-button:hover {
-    border-color: #f0b90b;
-    color: #f0b90b;
-}
-
-#aiBtn {
-    background: #f0b90b;
-    color: #111;
-    font-weight: 700;
-}
-
-.tip {
-    margin-left: auto;
-    color: #848e9c;
-    font-size: 11px;
-}
-
-/* CHART */
-
-#chart {
-    position: absolute;
-    top: 52px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-}
-
-/* AI PANEL */
-
-#aiPanel {
-    position: fixed;
-    z-index: 100;
-    right: 14px;
-    top: 65px;
-
-    width: 380px;
-    height: calc(100vh - 80px);
-
-    background: #161a1e;
-    border: 1px solid #30353d;
-    border-radius: 8px;
-
-    box-shadow: 0 12px 40px #0009;
-
-    display: none;
-}
-
-#aiHead {
-    height: 48px;
-
-    display: flex;
-    align-items: center;
-
-    padding: 0 12px;
-
-    border-bottom: 1px solid #30353d;
-}
-
-#aiHead strong {
-    color: #f0b90b;
-    font-size: 16px;
-}
-
-#closeAI {
-    margin-left: auto;
-    background: transparent;
-    border: 0;
-    font-size: 22px;
-}
-
-/* MESSAGES */
-
-#messages {
-    height: calc(100% - 137px);
-
-    overflow-y: auto;
-
-    padding: 12px;
-}
-
-.msg {
-    padding: 10px 12px;
-
-    margin-bottom: 9px;
-
-    border-radius: 7px;
-
-    font-size: 13px;
-
-    line-height: 1.45;
-
-    white-space: pre-wrap;
-}
-
-.msg.ai {
-    background: #1e2329;
-
-    border-left: 3px solid #f0b90b;
-}
-
-.msg.user {
-    background: #252a31;
-}
-
-/* AI CONTROLS */
-
-#aiControls {
-    position: absolute;
-
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    padding: 10px;
-
-    border-top: 1px solid #30353d;
-
-    background: #161a1e;
-}
-
-#prompt {
-    width: 100%;
-
-    height: 58px;
-
-    resize: none;
-
-    background: #0b0e11;
-
-    color: white;
-
-    border: 1px solid #3b4048;
-
-    border-radius: 6px;
-
-    padding: 9px;
-
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-.aiButtons {
-    display: flex;
-
-    gap: 6px;
-
-    margin-top: 7px;
-}
-
-.aiButtons button {
-    flex: 1;
-}
-
-#teachBtn {
-    background: #20262d;
-}
-
-#status {
-    font-size: 10px;
-
-    color: #848e9c;
-
-    margin-top: 6px;
-}
-</style>
-</head>
-
-<body>
-
-<!-- TOP BAR -->
-
-<div id="top">
-
-    <div class="logo">
-        SMC AI SCANNER
-    </div>
-
-    <input
-        id="symbol"
-        value="BINANCE:BTCUSDT"
-        placeholder="BINANCE:BTCUSDT"
-    >
-
-    <button onclick="loadSymbol()">
-        Load
-    </button>
-
-    <button onclick="loadSymbol('BINANCE:BTCUSDT')">
-        BTC
-    </button>
-
-    <button onclick="loadSymbol('BINANCE:ETHUSDT')">
-        ETH
-    </button>
-
-    <button onclick="loadSymbol('BINANCE:AVAXUSDT')">
-        AVAX
-    </button>
-
-    <button onclick="loadSymbol('BINANCE:SEIUSDT')">
-        SEI
-    </button>
-
-    <button onclick="loadSymbol('BINANCE:TIAUSDT')">
-        TIA
-    </button>
-
-    <button onclick="loadSymbol('BINANCE:API3USDT')">
-        API3
-    </button>
-
-    <button id="aiBtn" onclick="toggleAI()">
-        🤖 AI SMC
-    </button>
-
-    <div class="tip">
-        Live Binance • TradingView chart • SMC AI
-    </div>
-
-</div>
-
-<!-- CHART -->
-
-<div id="chart"></div>
-
-<!-- AI PANEL -->
-
-<div id="aiPanel">
-
-    <div id="aiHead">
-
-        <strong>
-            🤖 SMC AI
-        </strong>
-
-        <button
-            id="closeAI"
-            onclick="toggleAI()"
-        >
-            ×
-        </button>
-
-    </div>
-
-    <div id="messages">
-
-        <div class="msg ai">
-
-SMC AI is ready.
-
-Ask me about:
-
-• BSL / SSL
-• Liquidity sweep
-• SFP
-• CHoCH / MSS
-• BOS
-• Displacement
-• FVG
-• Order Blocks
-• Premium / Discount
-• Multi-timeframe SMC
-
-You can also teach me your own SMC rules.
-
-        </div>
-
-    </div>
-
-    <div id="aiControls">
-
-        <textarea
-            id="prompt"
-            placeholder="Example: A major swing high is buy-side liquidity. If price sweeps it and closes back below, I call it a valid BSL sweep."
-        ></textarea>
-
-        <div class="aiButtons">
-
-            <button onclick="askAI()">
-                Ask AI
-            </button>
-
-            <button
-                id="teachBtn"
-                onclick="teachAI()"
-            >
-                Teach AI
-            </button>
-
-            <button onclick="analyzeAI()">
-                Analyze
-            </button>
-
-        </div>
-
-        <div id="status">
-            AI: ready
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- TRADINGVIEW -->
-
-<script src="https://s3.tradingview.com/tv.js"></script>
-
-<script>
-
-let chartWidget = null;
-
-let currentSymbol = "BINANCE:BTCUSDT";
-
-let aiHistory = [];
-
-
-/* =========================
-   CREATE CHART
-========================= */
-
-function createChart(symbol) {
-
-    chartWidget = new TradingView.widget({
-
-        autosize: true,
-
-        symbol: symbol,
-
-        interval: "15",
-
-        timezone: "Etc/UTC",
-
-        theme: "dark",
-
-        style: "1",
-
-        locale: "en",
-
-        toolbar_bg: "#181a20",
-
-        enable_publishing: false,
-
-        allow_symbol_change: true,
-
-        hide_top_toolbar: false,
-
-        hide_side_toolbar: false,
-
-        hide_legend: false,
-
-        save_image: true,
-
-        withdateranges: true,
-
-        details: true,
-
-        hotlist: true,
-
-        calendar: true,
-
-        container_id: "chart",
-
-        enabled_features: [
-            "side_toolbar_in_fullscreen_mode"
-        ],
-
-        overrides: {
-
-            "paneProperties.backgroundType":
-                "solid",
-
-            "paneProperties.background":
-                "#0b0e11",
-
-            "paneProperties.vertGridProperties.color":
-                "#1b2027",
-
-            "paneProperties.horzGridProperties.color":
-                "#1b2027",
-
-            "mainSeriesProperties.candleStyle.upColor":
-                "#0ecb81",
-
-            "mainSeriesProperties.candleStyle.downColor":
-                "#f6465d",
-
-            "mainSeriesProperties.candleStyle.borderUpColor":
-                "#0ecb81",
-
-            "mainSeriesProperties.candleStyle.borderDownColor":
-                "#f6465d",
-
-            "mainSeriesProperties.candleStyle.wickUpColor":
-                "#0ecb81",
-
-            "mainSeriesProperties.candleStyle.wickDownColor":
-                "#f6465d"
-        }
-
-    });
-
-}
-
-
-/* =========================
-   CHANGE SYMBOL
-========================= */
-
-function loadSymbol(symbol) {
-
-    currentSymbol =
-        (
-            symbol ||
-            document.getElementById("symbol").value
-        )
-        .trim()
-        .toUpperCase();
-
-    document.getElementById("symbol").value =
-        currentSymbol;
-
-    if (
-        chartWidget &&
-        chartWidget.setSymbol
-    ) {
-
-        chartWidget.setSymbol(
-            currentSymbol,
-            "15"
-        );
-
-    } else {
-
-        createChart(currentSymbol);
-
-    }
-
-}
-
-
-/* =========================
-   AI PANEL
-========================= */
-
-function toggleAI() {
-
-    const panel =
-        document.getElementById("aiPanel");
-
-    if (
-        panel.style.display === "none" ||
-        panel.style.display === ""
-    ) {
-
-        panel.style.display = "block";
-
-    } else {
-
-        panel.style.display = "none";
-
-    }
-
-}
-
-
-/* =========================
-   ADD MESSAGE
-========================= */
-
-function addMessage(
-    text,
-    type
-) {
-
-    const messages =
-        document.getElementById("messages");
-
-    const div =
-        document.createElement("div");
-
-    div.className =
-        "msg " + type;
-
-    div.textContent =
-        text;
-
-    messages.appendChild(div);
-
-    messages.scrollTop =
-        messages.scrollHeight;
-
-}
-
-
-/* =========================
-   CALL AI BACKEND
-========================= */
-
-async function sendAI(
-    message,
-    mode
-) {
-
-    const status =
-        document.getElementById("status");
-
-    status.textContent =
-        "AI is thinking...";
+async function sendAI(message, mode = "analyze") {
 
     try {
 
-        const response =
-            await fetch(
-                "/api/ai",
-                {
+        const symbol = currentSymbol || "BTCUSDT";
 
-                    method: "POST",
+        /*
+         * Get the currently selected timeframe.
+         * Change this selector if your existing chart uses another ID.
+         */
+        const timeframe =
+            document.querySelector(".timeframe.active")?.dataset?.interval ||
+            window.currentInterval ||
+            "15m";
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+        /*
+         * Ask Binance for REAL candle data.
+         */
+        const binanceInterval = timeframe;
 
-                    body:
-                        JSON.stringify({
-
-                            message:
-                                message,
-
-                            mode:
-                                mode,
-
-                            symbol:
-                                currentSymbol,
-
-                            timeframe:
-                                "15m",
-
-                            history:
-                                aiHistory
-                                    .slice(-10)
-
-                        })
-
-                }
-            );
-
-
-        const data =
-            await response.json();
-
+        const response = await fetch(
+            `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${binanceInterval}&limit=300`
+        );
 
         if (!response.ok) {
-
-            throw new Error(
-                data.error ||
-                "AI request failed"
-            );
-
+            throw new Error("Binance candle request failed");
         }
 
+        const raw = await response.json();
 
-        const answer =
-            data.answer ||
-            "No answer returned.";
+        /*
+         * Convert Binance candles into clean OHLCV data.
+         */
+        const candles = raw.map((c, i) => ({
+            index: i,
+            time: Number(c[0]),
+            open: Number(c[1]),
+            high: Number(c[2]),
+            low: Number(c[3]),
+            close: Number(c[4]),
+            volume: Number(c[5])
+        }));
 
+        /*
+         * Send REAL chart data to our AI backend.
+         */
+        const aiResponse = await fetch("/api/ai", {
 
-        addMessage(
-            answer,
-            "ai"
-        );
+            method: "POST",
 
-
-        aiHistory.push(
-
-            {
-                role: "user",
-                content: message
+            headers: {
+                "Content-Type": "application/json"
             },
 
-            {
-                role: "assistant",
-                content: answer
-            }
+            body: JSON.stringify({
 
-        );
+                mode: mode,
 
+                message: message,
 
-        status.textContent =
-            "AI: ready";
+                symbol: symbol,
 
+                timeframe: binanceInterval,
+
+                candles: candles
+
+            })
+
+        });
+
+        const result = await aiResponse.json();
+
+        if (!aiResponse.ok) {
+            throw new Error(
+                result.error || "AI request failed"
+            );
+        }
+
+        /*
+         * Display AI answer.
+         */
+        const answer =
+            result.answer ||
+            result.response ||
+            "AI returned no answer.";
+
+        /*
+         * Use your existing AI output element here.
+         */
+        const aiOutput =
+            document.getElementById("aiResponse") ||
+            document.getElementById("ai-output") ||
+            document.getElementById("aiResult");
+
+        if (aiOutput) {
+            aiOutput.innerText = answer;
+        }
+
+        return answer;
 
     } catch (error) {
 
-        addMessage(
+        console.error("AI ERROR:", error);
 
-            "AI connection error:\n\n" +
-            error.message +
-            "\n\n" +
-            "Make sure Cloudflare Workers AI " +
-            "binding named AI is enabled.",
+        const aiOutput =
+            document.getElementById("aiResponse") ||
+            document.getElementById("ai-output") ||
+            document.getElementById("aiResult");
 
-            "ai"
+        if (aiOutput) {
 
-        );
-
-        status.textContent =
-            "AI: error";
-
-    }
-
-}
-
-
-/* =========================
-   ASK AI
-========================= */
-
-function askAI() {
-
-    const input =
-        document.getElementById("prompt");
-
-    const message =
-        input.value.trim();
-
-
-    if (!message)
-        return;
-
-
-    addMessage(
-        message,
-        "user"
-    );
-
-
-    input.value = "";
-
-
-    sendAI(
-        message,
-        "chat"
-    );
-
-}
-
-
-/* =========================
-   TEACH AI
-========================= */
-
-function teachAI() {
-
-    const input =
-        document.getElementById("prompt");
-
-    const lesson =
-        input.value.trim();
-
-
-    if (!lesson) {
-
-        input.focus();
-
-        return;
-
-    }
-
-
-    const message =
-
-`I am teaching you my SMC methodology.
-
-Treat the following as a labeled example/rule from my methodology:
-
-${lesson}
-
-Convert this into:
-
-1. Concept name.
-2. Objective conditions a scanner can detect.
-3. Confirmation conditions.
-4. Invalidation conditions.
-5. Required OHLCV/chart data.
-6. A concise rule suitable for automated SMC scanning.
-
-Do not invent rules that I did not provide.`;
-
-
-    addMessage(
-        "TEACH AI:\n\n" +
-        lesson,
-        "user"
-    );
-
-
-    input.value = "";
-
-
-    sendAI(
-        message,
-        "teach"
-    );
-
-}
-
-
-/* =========================
-   ANALYZE
-========================= */
-
-function analyzeAI() {
-
-    const message =
-
-`Analyze ${currentSymbol} on the 15m timeframe using my SMC methodology.
-
-Validate:
-
-• Liquidity sweep
-• Displacement
-• CHoCH / MSS
-• BOS
-• FVG
-• Order Block
-
-Important:
-You do not have direct access to the chart candles through this request.
-
-Do not invent current price or candle data.
-
-Tell me exactly what market/chart data is required for a reliable SMC decision.`;
-
-
-    addMessage(
-        message,
-        "user"
-    );
-
-
-    sendAI(
-        message,
-        "analyze"
-    );
-
-}
-
-
-/* =========================
-   ENTER TO SEND
-========================= */
-
-document
-    .getElementById("symbol")
-    .addEventListener(
-        "keydown",
-        function(e) {
-
-            if (e.key === "Enter") {
-
-                loadSymbol();
-
-            }
+            aiOutput.innerText =
+                "AI connection error: " +
+                error.message;
 
         }
-    );
 
-
-document
-    .getElementById("prompt")
-    .addEventListener(
-        "keydown",
-        function(e) {
-
-            if (
-                e.key === "Enter" &&
-                !e.shiftKey
-            ) {
-
-                e.preventDefault();
-
-                askAI();
-
-            }
-
-        }
-    );
-
-
-/* =========================
-   START
-========================= */
-
-createChart(
-    currentSymbol
-);
-
-</script>
-
-</body>
-</html>
+        return null;
+    }
+}
